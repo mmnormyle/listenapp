@@ -125,6 +125,10 @@ function onPlayerStateChange(event) {
     }
 }
 
+function nextPlayerVideo(first) {
+	
+}
+
 /* ================ BACKEND FUNCTIONS ================ */
 
 function searchVideos() {
@@ -185,6 +189,30 @@ function createSession(sessionName) {
 
 function getSession(sessionName) {
 
+	$.getJSON('/sessionlist', function(data) {
+		$.each(data, function() {
+			if(this.name===sessionName) {
+				session = this;
+				/*if(session.get("num_users")>0) {
+  					// master = true;
+  					master = false;
+  					//TODObig: figure this shit out
+  				}
+  				else {
+  					master = true;
+  				}
+  				session.increment("num_users");
+  				session.add("current_users_names", name);
+  				session.save();
+  				synchronize();
+				setInterval(synchronize, 5000);*/
+				sessionInitialized = true;
+				nextPlayerVideo(true);
+				$("#div_music").fadeIn(1000);
+				alert(session.name);
+			}
+		});
+	});
 }
 
 function synchronize() {
@@ -192,7 +220,9 @@ function synchronize() {
 }
 
 function enterJamSession() {
-
+	$("#div_genre").hide();
+	name = $("#txt_name_join").val();
+	getSession($("#txt_group_join").val());
 }
 
 function popFromQueue() {
