@@ -1,0 +1,35 @@
+extends layout
+
+block content
+	div(id="div_genre", style="width:100%, height: 100%")
+		.container
+			.genre_outer
+				div(class="genre_inner", style="background: red") Jazz
+			.genre_outer
+				div(class="genre_inner", style="background: orange") Rock
+			.genre_outer
+				div(class="genre_inner", style="background: teal") Indie
+			.genre_outer
+				div(class="genre_inner", style="background: green") Soul
+			.genre_outer
+				div(class="genre_inner", style="background: blue") Funk
+			.genre_outer
+				div(class="genre_inner", style="background: indigo") Rap
+			.genre_outer
+				div(class="genre_inner", style="background: violet") Pop
+			.genre_outer
+				div(class="genre_inner", style="background: grey") Hip Hop
+			.genre_outer
+				div(class="genre_inner", style="background: black") Metal
+			div.search
+				input(id="txt_group_join", type="text", placeholder="What's your group name?" class="edittext")
+				input(id="txt_name_join", type="text", placeholder="What's your name" class="edittext")
+	div(id="div_music", style="width:100%; height:100%")
+	div(id="div_unfinished", style="width:100%; height:100%") 
+		.container.error_div
+			| Stupid idiot. This feature hasn't been implemented.
+	
+
+
+
+

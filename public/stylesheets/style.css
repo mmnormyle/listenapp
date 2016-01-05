@@ -1,0 +1,114 @@
+* {
+	box-sizing: border-box;
+}
+
+#div_music {
+	height: 70%;
+}
+
+#div_genre {
+	height: 50%;
+}
+
+.container {
+	
+	width: 50%;
+    height: 50%;
+
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+
+.genre_outer {
+	width: 33%;
+	height: 33%;
+	display: inline-block;
+	float: left;
+	text-align: center;
+}
+
+.genre_inner {
+	height: 50%;
+	width: 80%;
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+}
+
+.col {
+	height: 100%;
+	float: left;
+}
+
+.error_div {
+	text-align: center;
+}
+
+#downvote {
+	width: 16.5%;
+}
+
+#player {
+	width: 66%;
+}
+
+#upvote {
+	width: 16.5%;
+}
+
+.edittext {
+	border: 0;
+	outline: 0;
+	background: transparent;
+	border-bottom: 2px solid black;
+	margin: auto;
+	width: 92%;
+	text-align: center;
+}
+
+input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-bottom: 1px solid black;
+    width: 20px;
+    text-align: center;
+}
+
+.search {
+	text-align: center;
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+body {
+        font-family: 'Josefin Sans', serif;
+}
+
+.div_user_outer {
+	display:flex;
+	align-items:center;
+}
+
+.div_user_inner {
+	margin-left: 20%; 
+	display: inline-block; 
+	width: 27px; 
+	height: 27px;
+}
+
+.span_user {
+	margin-top: 2px;
+	margin-left: 8px;
+	display: block;
+}
