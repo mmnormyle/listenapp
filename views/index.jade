@@ -25,6 +25,31 @@ block content
 				input(id="txt_group_join", type="text", placeholder="What's your group name?" class="edittext")
 				input(id="txt_name_join", type="text", placeholder="What's your name" class="edittext")
 	div(id="div_music", style="width:100%; height:100%")
+		#div_left.col
+			| In the room
+			br
+			br
+			#div_users_list
+		#div_player.col
+			#div_recommender
+				p#p_recommender
+			br
+			#div_youtube_wrapper
+				#youtubeplayer
+			br
+			br
+			#div_queue
+				| Up next...
+				ul#list_queue
+		#div_right.col
+			| Add to the queue
+			br
+			br
+			#div_queue_wrapper
+				input(id="txt_search_videos", type="text", placeholder="Type an artist and song name and hit enter")
+			br
+			ul#list_search_results
+
 	div(id="div_unfinished", style="width:100%; height:100%") 
 		.container.error_div
 			| Stupid idiot. This feature hasn't been implemented.

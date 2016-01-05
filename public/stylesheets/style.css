@@ -112,3 +112,60 @@ body {
 	margin-left: 8px;
 	display: block;
 }
+
+#div_left {
+	width: 33.333%;
+	margin-top: 7%;
+}
+
+#div_users_list {
+	padding-right: 30px;
+}
+
+#div_player {
+	width: 33.333%;
+	margin-top: 7%;
+}
+
+#div_recommender {
+	text-align: center;
+}
+
+#p_recommender {
+	display: inline;
+}
+
+#div_youtube_wrapper {
+	display: flex;
+	justify-content: center;
+}
+
+#youtubeplayer {
+
+}
+
+#div_queue {
+	width: 100%;
+	text-align: center;
+	margin-top: 2%;
+}
+
+#div_right {
+	width: 33.333%;
+	margin-top: 7%;
+	text-align: right;
+}
+
+#div_queue_wrapper {
+	padding-left: 30px;
+	padding-right: 8px;
+}
+
+#txt_search_videos {
+	display: block;
+	width: 100%;
+	text-align: right;
+}
+
+
+
