@@ -14,8 +14,6 @@ build
 
 node_modules
 
-bin
-
 public/images
 
 data/
