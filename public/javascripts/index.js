@@ -21,6 +21,11 @@ $(document).ready(function(){
 			$("#txt_name_join").select();
 		}
 	});
+	$("#txt_search_videos").keypress(function(e) {
+		if(e.which==13) {
+			searchVideos();
+		}
+	});
 
 });
 
@@ -66,11 +71,11 @@ function onYouTubeIframeAPIReady() {
 function updateQueueUI() {
 	var queueList = document.getElementById('list_queue');
 	queueList.innerHTML = "";
-	var queue = session.get("queue");
+	var queue = session.queue;
 	for(var i=0;i<queue.length;i++) {
-		var recommendation = queue[i];
-		console.log("title: " + recommendation.get("title"));
-		var innerht = "<li><div><img src='" + recommendation.get("thumb_URL") + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.get("title") + "</span></div></li><br>";
+		//TODO : JSON issues
+		var recommendation = JSON.parse(queue[i]);
+		var innerht = "<li><div><img src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
 		queueList.innerHTML += innerht;
 	}
 }
@@ -78,7 +83,7 @@ function updateQueueUI() {
 function updateUsersList() {
 	var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
-	var users = session.get("current_users_names");
+	var users = session.current_users_names;
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		var color = COLORS[i%COLORS.length];
@@ -97,7 +102,7 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 	player.loadVideoById(current_video, current_video_time, "large");	
 	$("#p_recommender").text("Recommended by " + current_recommender_name);
 	var color = 'black';
-	var users = session.get("current_users_names");
+	var users = session.current_users_names;
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		if(user===current_recommender_name) {
@@ -127,7 +132,25 @@ function onPlayerStateChange(event) {
 }
 
 function nextPlayerVideo(first) {
-	
+	var video_time = 0;
+	if(master) {
+		var started = popFromQueue();
+		if(started) {
+			updatePlayerUI(session.current_video, video_time, session.current_recommender_name);
+		}
+		else {
+			$("#p_recommender").text("Queue up a song!");
+			$("#p_recommender").css("border-bottom", "1px solid black");
+			waiting = true;
+		}
+	}
+	//not the master, there should always be a current_video
+	else {
+		if(first) {
+			video_time = session.current_video_time;
+		}	
+		updatePlayerUI(session.current_video, video_time, session.current_recommender_name);
+	}
 }
 
 /* ================ BACKEND FUNCTIONS ================ */
@@ -145,41 +168,35 @@ function searchVideos() {
 		var results = response.result;
 		clearSearchResults();
 		$.each(results.items, function(index, item) {
-			console.log(item);
 			searchList.innerHTML += ("<li onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li>');
 		});
 	});
 }
 
 function queueSelectedVideo(elmnt) {
+
 	clearSearchResults();
-	var Recommendation = Parse.Object.extend("Recommendation");
-	var recommendation = new Recommendation();
+	var recommendation = {};
 
 	var videoID = elmnt.getAttribute('data-videoId');
 	var title = elmnt.innerText || element.textContent;
 	var thumb_URL = elmnt.getAttribute('data-thumb_URL');
 
-	recommendation.set("videoID", videoID);
-	recommendation.set("title", title);
-	// recommendation.set("recommender")
-	recommendation.set("thumb_URL", thumb_URL);
-	recommendation.set("recommender_name", name);
-	recommendation.save(null, {
-		success: function(recommendation) {
-			if(sessionInitialized) {
-				session.fetch();
-				session.add("queue", recommendation);
-				updateQueueUI();
-				session.save();
-				if(master && waiting) {
-					waiting = false;
-					nextPlayerVideo(true);
-				}
-			}
-		},
-		error: function(recommendation, error) {
-		    alert('Failed to create new object, with error code: ' + error.message);
+	recommendation.videoID = videoID;
+	recommendation.title = title;
+	recommendation.thumb_URL = thumb_URL;
+	recommendation.recommender_name = name;
+
+	//TODO: JSON issues
+	session.queue.push(JSON.stringify(recommendation));
+	
+	console.log(session);
+
+	saveSession(function() {
+		updateQueueUI();
+		if(master && waiting) {
+			waiting = false;
+			nextPlayerVideo(true);
 		}
 	});
 }
@@ -188,50 +205,88 @@ function createSession(sessionName) {
 
 }
 
-function getSession(sessionName) {
+function queryForSession(sessionName, callbackFunction) {
 	$.getJSON('/sessionlist', function(data) {
 		$.each(data, function() {
 			if(this.name===sessionName) {
 				session = this;
 				//TODO: weird ass workaround
-				console.log(session.current_users_names.constructor);
-				if(!(session.current_users_names.constructor===Array)) {
-					session.current_users_names = [session.current_users_names];
+				if(session.current_users_names!=null) {
+					if(!(session.current_users_names.constructor===Array)) {
+						session.current_users_names = [session.current_users_names];
+					}
 				}
-				if(!(session.queue.constructor===Array)) {
-					session.queue = [session.queue];
+				else {
+					session.current_users_names = [];
 				}
-				if(session.current_users_names.length>0) {
-  					master = false;
-  				}
-  				else {
-  					master = true;
-  				}
-  				session.current_users_names.push(name);
-  				saveSession();
-  				synchronize();
-				setInterval(synchronize, 5000);
-				sessionInitialized = true;
-				nextPlayerVideo(true);
-				$("#div_music").fadeIn(1000);
+				
+				if(session.queue!=null) {
+					if(!(session.queue.constructor===Array)) {
+						session.queue = [session.queue];
+					}	
+				}
+				else {
+					session.queue = [];
+				}
+				callbackFunction();
 			}
 		});
 	});
 }
 
-function saveSession() {
-	console.log(session);
+function getSession(sessionName) {
+	queryForSession(sessionName, function() {
+		if(session.current_users_names.length>0) {
+			master = false;
+		}
+		else {
+			console.log('user is master');
+			master = true;
+		}
+		console.log(session);
+		session.current_users_names.push(name);
+		saveSession();
+		sessionInitialized = true;
+		synchronize();
+		setInterval(synchronize, 5000);
+		nextPlayerVideo(true);
+		$("#div_music").fadeIn(1000);	
+	});			
+}
+
+function saveSession(callbackFunc) {
 	$.ajax({
 		type: 'POST',
 		url: '/savesession',
 		data: session, 
 		dataType: "json",
 		traditional : true
+	}).done(function() {
+		if(callbackFunc!=null) {
+			callbackFunc();
+		}
 	});
 }
 
 function synchronize() {
-
+	console.log('Synchronizing');
+	if(sessionInitialized) {
+		queryForSession(session.name, function() {
+			console.log(session);
+			updateQueueUI();
+			updateUsersList();
+			if(!master) {
+				updatePlayerState(session.player_state);
+			}
+			else {
+				if(player_ready) {
+					session.current_video_time = player.getCurrentTime();
+					session.player_state = player.getPlayerState();
+					saveSession();		
+				}				
+			}				
+		});
+	}
 }
 
 function enterJamSession() {
@@ -241,7 +296,23 @@ function enterJamSession() {
 }
 
 function popFromQueue() {
-
+	var queue = session.queue;
+	if(queue.length>0) {
+		var recommendation = JSON.parse(queue[0]);
+		session.current_video = recommendation.videoID;
+		session.current_video_time = 0;
+		session.current_recommender_name = recommendation.recommender_name;
+		//TODO: make cleaner
+		for(var i=0;i<session.queue.length;i++) {
+			if(session.queue[i].videoID = recommendation.videoID) {
+				session.queue.splice(i,1);		
+			}
+		}
+		saveSession();
+		updateQueueUI();
+		return true;
+	}
+	return false;
 }
 
 function youtubeAPIInit() {

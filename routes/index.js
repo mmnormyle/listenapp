@@ -17,8 +17,6 @@ router.get('/sessionlist', function(req, res, next) {
 router.post('/savesession', function(req, res) {
 
 	var session = req.body;
-	console.log(session);
-	console.log(session.current_users_names);
 
 	var db = req.db;
 	var sessions = db.get('sessions');
