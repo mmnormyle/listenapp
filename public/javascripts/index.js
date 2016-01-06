@@ -21,6 +21,7 @@ $(document).ready(function(){
 			$("#txt_name_join").select();
 		}
 	});
+
 });
 
 /* =============== GLOBAL VARIABLES ================= */
@@ -188,30 +189,44 @@ function createSession(sessionName) {
 }
 
 function getSession(sessionName) {
-
 	$.getJSON('/sessionlist', function(data) {
 		$.each(data, function() {
 			if(this.name===sessionName) {
 				session = this;
-				/*if(session.get("num_users")>0) {
-  					// master = true;
+				//TODO: weird ass workaround
+				console.log(session.current_users_names.constructor);
+				if(!(session.current_users_names.constructor===Array)) {
+					session.current_users_names = [session.current_users_names];
+				}
+				if(!(session.queue.constructor===Array)) {
+					session.queue = [session.queue];
+				}
+				if(session.current_users_names.length>0) {
   					master = false;
-  					//TODObig: figure this shit out
   				}
   				else {
   					master = true;
   				}
-  				session.increment("num_users");
-  				session.add("current_users_names", name);
-  				session.save();
+  				session.current_users_names.push(name);
+  				saveSession();
   				synchronize();
-				setInterval(synchronize, 5000);*/
+				setInterval(synchronize, 5000);
 				sessionInitialized = true;
 				nextPlayerVideo(true);
 				$("#div_music").fadeIn(1000);
-				alert(session.name);
 			}
 		});
+	});
+}
+
+function saveSession() {
+	console.log(session);
+	$.ajax({
+		type: 'POST',
+		url: '/savesession',
+		data: session, 
+		dataType: "json",
+		traditional : true
 	});
 }
 

@@ -14,4 +14,28 @@ router.get('/sessionlist', function(req, res, next) {
   });
 });
 
+router.post('/savesession', function(req, res) {
+
+	var session = req.body;
+	console.log(session);
+	console.log(session.current_users_names);
+
+	var db = req.db;
+	var sessions = db.get('sessions');
+	sessions.updateById(session._id,
+	 {$set : 
+	 	{
+	 		'current_users_names':session.current_users_names,
+	 		'name':session.name,
+	 		'current_video':session.current_video,
+	 		'current_recommender_name':session.current_recommender_name,
+	 		'queue':session.queue,
+	 		'player_state':session.player_state
+	 	}}, 
+	 	function() {
+			console.log('updated session');
+		}
+	);
+})
+
 module.exports = router;
