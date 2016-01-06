@@ -15,9 +15,7 @@ router.get('/sessionlist', function(req, res, next) {
 });
 
 router.post('/savesession', function(req, res) {
-
 	var session = req.body;
-
 	var db = req.db;
 	var sessions = db.get('sessions');
 	sessions.updateById(session._id,
@@ -30,10 +28,11 @@ router.post('/savesession', function(req, res) {
 	 		'queue':session.queue,
 	 		'player_state':session.player_state
 	 	}}, 
-	 	function() {
+	 	function(err) {
 			console.log('updated session');
+			res.send((err === null) ? {msg : ''} : {msg : err});	
 		}
 	);
-})
+});
 
 module.exports = router;

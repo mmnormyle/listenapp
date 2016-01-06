@@ -206,31 +206,39 @@ function createSession(sessionName) {
 }
 
 function queryForSession(sessionName, callbackFunction) {
-	$.getJSON('/sessionlist', function(data) {
-		$.each(data, function() {
-			if(this.name===sessionName) {
-				session = this;
-				//TODO: weird ass workaround
-				if(session.current_users_names!=null) {
-					if(!(session.current_users_names.constructor===Array)) {
-						session.current_users_names = [session.current_users_names];
+	$.ajax({
+		dataType : "json",
+		url : '/sessionlist',
+		success: function(data) {
+			$.each(data, function() {
+				if(this.name===sessionName) {
+					session = this;
+					//TODO: weird ass workaround
+					if(session.current_users_names!=null) {
+						if(!(session.current_users_names.constructor===Array)) {
+							session.current_users_names = [session.current_users_names];
+						}
 					}
+					else {
+						session.current_users_names = [];
+					}
+					
+					if(session.queue!=null) {
+						if(!(session.queue.constructor===Array)) {
+							session.queue = [session.queue];
+						}	
+					}
+					else {
+						session.queue = [];
+					}
+					callbackFunction();
 				}
-				else {
-					session.current_users_names = [];
-				}
-				
-				if(session.queue!=null) {
-					if(!(session.queue.constructor===Array)) {
-						session.queue = [session.queue];
-					}	
-				}
-				else {
-					session.queue = [];
-				}
-				callbackFunction();
-			}
-		});
+			});
+		},
+		error: function() {
+			console.log('error getting sessions list');
+		},
+		timeout : 3000
 	});
 }
 
@@ -260,19 +268,23 @@ function saveSession(callbackFunc) {
 		url: '/savesession',
 		data: session, 
 		dataType: "json",
-		traditional : true
-	}).done(function() {
-		if(callbackFunc!=null) {
-			callbackFunc();
+		traditional: true,
+		timeout: 3000,
+		success: function() {
+			if(callbackFunc!=null) {
+				callbackFunc();	
+			}
+		},
+		error: function() {
+			console.log('error saving session');
 		}
 	});
 }
 
 function synchronize() {
-	console.log('Synchronizing');
+	console.log('attempting to synchronize');
 	if(sessionInitialized) {
 		queryForSession(session.name, function() {
-			console.log(session);
 			updateQueueUI();
 			updateUsersList();
 			if(!master) {
