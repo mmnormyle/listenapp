@@ -114,10 +114,10 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 
 function updatePlayerState(state) {
 	if(player_ready) {
-		if(state===PLAYING) {
+		if(state==PLAYING) {
 			player.playVideo();
 		}
-		else if(state===PAUSED) {
+		else if(state==PAUSED) {
 			player.pauseVideo();
 		}
 	}
@@ -292,7 +292,9 @@ function synchronize() {
 			}
 			else {
 				if(player_ready) {
+					console.log('updating time: ' + player.getCurrentTime());
 					session.current_video_time = player.getCurrentTime();
+					console.log(session.current_video_time);
 					session.player_state = player.getPlayerState();
 					saveSession();		
 				}				

@@ -26,7 +26,8 @@ router.post('/savesession', function(req, res) {
 	 		'current_video':session.current_video,
 	 		'current_recommender_name':session.current_recommender_name,
 	 		'queue':session.queue,
-	 		'player_state':session.player_state
+	 		'player_state':session.player_state,
+	 		'current_video_time':session.current_video_time
 	 	}}, 
 	 	function(err) {
 			console.log('updated session');
