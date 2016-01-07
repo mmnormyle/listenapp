@@ -1,0 +1,23 @@
+schema
+
+session:
+	name, current_users, queue
+
+	name: string identifying the name of the session
+	current_users: array of session_user objects
+		session_user: user_objectId (correspoding to database user), video time, queue position, player state
+	queue: array of recommendation objects
+		
+
+user:
+	temporary, name, password, recommendations
+
+	temporary: boolean
+	name: name of user
+	password: need to figure out the best way to store this
+	recommendations: array of recommendations made by the user 
+
+recommendation:
+	user_objectID (whoever recommended), videoID, likes, dislikes
+
+goals: clean up globals, clean up code and modularize it, refactor database to use above system, get rid of shitty master system
