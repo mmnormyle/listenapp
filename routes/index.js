@@ -19,7 +19,26 @@ module.exports = function(io) {
 		var session = req.body;
 		var db = req.db;
 		var sessions = db.get('sessions');
+		
 		//TODO: weird ass workaround
+		if(session.current_users_names!=null) {
+			if(!(session.current_users_names.constructor===Array)) {
+				session.current_users_names = [session.current_users_names];
+			}
+		}
+		else {
+			session.current_users_names = [];
+		}
+		
+		if(session.queue!=null) {
+			if(!(session.queue.constructor===Array)) {
+				session.queue = [session.queue];
+			}	
+		}
+		else {
+			session.queue = [];
+		}
+
 		sessions.updateById(session._id,
 		 {$set : 
 		 	{

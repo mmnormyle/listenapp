@@ -63,12 +63,6 @@ io.on('connection', function (socket) {
                 console.log("Found session");
                 var session = results[0];
                 var current_users_names = session.current_users_names;
-                //TODO: weird ass workaround
-                if(current_users_names!=null) {
-                    if(!(current_users_names.constructor===Array)) {
-                        current_users_names = [current_users_names];
-                    }
-                }
                 current_users_names.splice(current_users_names.indexOf(socket.user), 1);
                 sessions.updateById(socket.sessionId, {$set : {'current_users_names':current_users_names}}, function(err) {
                     console.log(err===null ? 'updated session' : err);
