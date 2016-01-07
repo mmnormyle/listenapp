@@ -38,9 +38,49 @@ app.use(function(req,res,next) {
 app.use('/', routes);
 app.use('/users', users);
 
-/*io.on('connection', function (socket) {
-  console.log('poop');
-});*/
+
+io.on('connection', function (socket) {
+  
+  console.log('user connected');
+
+  socket.loggedIn = false;
+
+  socket.on('sendinfo', function(info) {
+    console.log('user sent info: ' + info.user + " " + info.sessionId);
+    socket.user = info.user;
+    socket.sessionId = info.sessionId;
+    socket.loggedIn = true;
+    //update database by adding user
+  });
+
+    socket.on('disconnect', function() {
+        console.log(socket.user + " disconnected");
+        //update database by removing user
+        var sessions = db.get('sessions');
+
+        sessions.find({_id : socket.sessionId},{},function(e,results) {
+            if(results.length>0) {
+                console.log("Found session");
+                var session = results[0];
+                var current_users_names = session.current_users_names;
+                //TODO: weird ass workaround
+                if(current_users_names!=null) {
+                    if(!(current_users_names.constructor===Array)) {
+                        current_users_names = [current_users_names];
+                    }
+                }
+                current_users_names.splice(current_users_names.indexOf(socket.user), 1);
+                sessions.updateById(socket.sessionId, {$set : {'current_users_names':current_users_names}}, function(err) {
+                    console.log(err===null ? 'updated session' : err);
+                });
+            }
+            else {
+                console.log("Couldn't find session.");
+            }
+        });
+    });
+
+});
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

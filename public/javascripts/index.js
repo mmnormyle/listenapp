@@ -1,11 +1,5 @@
 $(document).ready(function(){
 
-	var socket = io.connect('http://localhost');
-  socket.on('news', function (data) {
-    console.log(data);
-    socket.emit('my other event', { my: 'data' });
-  });
-
 	$("#div_music").hide();
 	$("#div_new_session").hide();
 	$("#div_unfinished").hide();
@@ -36,7 +30,6 @@ $(document).ready(function(){
 });
 
 /* =============== GLOBAL VARIABLES ================= */
-
 var COLORS = ["green","red","blue","orange","teal"];
 var session;
 var master;
@@ -46,6 +39,7 @@ var player;
 var player_ready = false;
 var PLAYING = 1;
 var PAUSED = 2;
+var mSocket;
 
 /* ================== UI FUNCTIONS ================== */
 
@@ -257,7 +251,12 @@ function getSession(sessionName) {
 			console.log('user is master');
 			master = true;
 		}
-		console.log(session);
+		mSocket = io();
+		var data = {
+			user : name,
+			sessionId : session._id
+		};
+		mSocket.emit('sendinfo', data);
 		session.current_users_names.push(name);
 		saveSession();
 		sessionInitialized = true;
@@ -265,7 +264,7 @@ function getSession(sessionName) {
 		setInterval(synchronize, 5000);
 		nextPlayerVideo(true);
 		$("#div_music").fadeIn(1000);	
-	});			
+	});	
 }
 
 function saveSession(callbackFunc) {
