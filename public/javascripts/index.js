@@ -32,8 +32,8 @@ $(document).ready(function(){
 /* =============== GLOBAL VARIABLES ================= */
 var COLORS = ["green","red","blue","orange","teal"];
 var session;
-var master;
-var name;
+//name and master
+var mUser = {};
 var sessionInitialized = false;
 var player;
 var player_ready = false;
@@ -133,7 +133,7 @@ function onPlayerStateChange(event) {
 
 function nextPlayerVideo(first) {
 	var video_time = 0;
-	if(master) {
+	if(mUser.master) {
 		var started = popFromQueue();
 		if(started) {
 			updatePlayerUI(session.current_video, video_time, session.current_recommender_name);
@@ -185,7 +185,7 @@ function queueSelectedVideo(elmnt) {
 	recommendation.videoID = videoID;
 	recommendation.title = title;
 	recommendation.thumb_URL = thumb_URL;
-	recommendation.recommender_name = name;
+	recommendation.recommender_name = mUser.name;
 
 	//TODO: JSON issues
 	session.queue.push(JSON.stringify(recommendation));
@@ -194,7 +194,7 @@ function queueSelectedVideo(elmnt) {
 
 	saveSession(function() {
 		updateQueueUI();
-		if(master && waiting) {
+		if(mUser.master && waiting) {
 			waiting = false;
 			nextPlayerVideo(true);
 		}
@@ -227,19 +227,19 @@ function queryForSession(sessionName, callbackFunction) {
 function getSession(sessionName) {
 	queryForSession(sessionName, function() {
 		if(session.current_users_names.length>0) {
-			master = false;
+			mUser.master = false;
 		}
 		else {
 			console.log('user is master');
-			master = true;
+			mUser.master = true;
 		}
 		mSocket = io();
 		var data = {
-			user : name,
+			user : mUser,
 			sessionId : session._id
 		};
 		mSocket.emit('sendinfo', data);
-		session.current_users_names.push(name);
+		session.current_users_names.push(mUser);
 		saveSession();
 		sessionInitialized = true;
 		synchronize();
@@ -274,7 +274,7 @@ function synchronize() {
 		queryForSession(session.name, function() {
 			updateQueueUI();
 			updateUsersList();
-			if(!master) {
+			if(!mUser.master) {
 				updatePlayerState(session.player_state);
 			}
 			else {
@@ -292,7 +292,7 @@ function synchronize() {
 
 function enterJamSession() {
 	$("#div_genre").hide();
-	name = $("#txt_name_join").val();
+	mUser.name = $("#txt_name_join").val();
 	getSession($("#txt_group_join").val());
 }
 
@@ -322,4 +322,5 @@ function youtubeAPIInit() {
 }
 
 function socketioLoad() {
+
 }
