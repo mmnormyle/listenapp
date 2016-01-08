@@ -45,7 +45,9 @@ var mGlobals = {
 	socket : {},
 	player : {},
 	user : {},
-	session : {}
+	session : {},
+	queue : [],
+	current_users : []
 };
 
 
@@ -101,14 +103,12 @@ function nextVideoInQueue(first) {
 	mGlobals.user.video_time = 0;
 
 	var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
-	var queue = mGlobals.user.queue_position;
+	var queue = mGlobals.queue;
 
 	if(queue_position<queue.length) {
-		var recommendationId = queue[queue_position];
-		fetchRecommendationFromDatabase(recommendationId, function(recommendation) {
-			updateQueue();
-			updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);	
-		});
+		var recommendation = queue[queue_position];
+		updateQueue();
+		updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);	
 		return true;
 	}
 	else {
@@ -145,81 +145,33 @@ function saveUserVideoState() {
 function setupSocketEvents() {
 	//receives the newest user and session objects from database
 	socket.on('updateUser', updateUser(user));
-	socket.on('updateSession', sessionUpdate(session));
-	socket.on('sessionReady', sessionReady(session));
+	socket.on('sessionReady', sessionReady(data));
+	socket.on('updateUsersList', updateUsersList(JSON.parse(users)));
+	socket.on('updateQueue', updateQueue(JSON.parse(queue)));
+}
+
+function updateUsersList(users) {
+	mGlobals.current_users = users;
+	updateUsersListUI(mGlobals.current_users);
+}
+
+function updateQueue(queue) {
+	mGlobals.queue = queue;
+	updateQueueUI(mGlobals.queue);
 }
 
 function updateUser(user) {
 	mGlobals.user = user;
 }
 
-function updateSession(session) {
-	mGlobals.session = session;
-	updateQueue();
-	updateUsersList();
-	if(mGlobals.user.waiting) {
-		nextVideoInQueue(true);
-	}
-}
-
-function sessionReady(session) {
-	mGlobals.session = session;
+function sessionReady(data) {
+	mGlobals.sessionId = data.session._id;
+	mGlobals.queue = data.queue;
+	mGlobals.current_users = data.current_users;
 	saveUserVideoState();
 	setInterval(saveUserVideoState, 10000);
 	mGlobals.user.waiting = nextVideoInQueue(true);
 	enterJamSessionUI();
-}
-
-function updateQueue() {
-	jQuery.ajax({
-		type : 'GET',
-		url : '/fetchqueue',
-		data : JSON.stringify(mGlobals.session.queue),
-		dataType : 'json',
-		success : function(data) {
-			//TODO: JSON issues
-			var queue = data; //JSON.parse(data);
-			updateQueueUI(queue);
-		},
-		error: function() {
-			console.log('error getting queue from database');
-		}
-	});
-}
-
-function updateUsersList() {
-	jQuery.ajax({
-		type : 'GET',
-		url : '/fetchusersinsession',
-		data : JSON.stringify(mGlobals.session.current_users),
-		dataType : 'json',
-		success : function(data) {
-			//TODO: JSON issues
-			var current_users = data; //JSON.parse(data);
-			updateUsersListUI(current_users);
-		},
-		error: function() {
-			console.log('error getting user list from database');
-		}
-	});
-}
-
-function fetchRecommendationFromDatabase(recommendationId, callbackFunc) {
-	jQuery.ajax({
-		type : 'GET',
-		url : '/fetchrecommendation',
-		data : recommendationId,
-		dataType : 'json',
-		success : function(data) {
-			var recommendation = data;
-			if(!(callbackFunc===null)) {
-				callbackFunc(recommendation);
-			}
-		},
-		error: function() {
-			console.log('error getting user list from database');
-		}
-	});
 }
 
 //starts the whole shebang
@@ -227,7 +179,8 @@ function enterJamSession() {
 	mGlobals.socket = io();
 	setupSocketEvents();
 	
-	var sessionName = $("#txt_group_join").val(); 
+	var sessionName = $("#txt_group_join").val();
+	mGlobals.session.name = sessionName;
 
 	//TODO: better login flow
 	var name = $("#txt_name_join").val();
@@ -235,7 +188,7 @@ function enterJamSession() {
 
 	var data = {
 		user : mGlobals.user,
-		sessionName : sessionName
+		sessionName : mGlobals.session.name
 	};
 	socket.emit('userLoginToSession', data);
 
@@ -308,10 +261,10 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 	mGlobals.player.loadVideoById(current_video, current_video_time, "large");	
 	$("#p_recommender").text("Recommended by " + current_recommender_name);
 	var color = 'black';
-	var users = getUsersFromDatabase(mGlobals.session.current_users);
+	var users = mGlobals.current_users;
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
-		if(user===current_recommender_name) {
+		if(user.name===current_recommender_name) {
 			color = mConstants.COLORS[i % mConstants.COLORS.length];
 		}
 	}
