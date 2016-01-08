@@ -92,8 +92,8 @@ io.on('connection', function (socket) {
                 if(results.length>0) {
                     console.log("Found session");
                     var session = results[0];
-                    var current_users_names = session.current_users_names;
-                    current_users_names.splice(current_users_names.indexOf(socket.user.name), 1);
+                    var current_users = session.current_users;
+                    current_users.splice(current_users_names.indexOf(socket.user.name), 1);
                     if(current_users_names.length==0) {
                         //destroy session
                     }

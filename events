@@ -1,0 +1,12 @@
+Sent by client:
+
+userLoginToSession 
+	triggered when client is logged in (maybe to temporary user) and wants to get into a session
+	Server will:
+	1. create the session if it doesn't exist
+	2. save the user object to database if it is a temp user
+	3. sync up the session and user
+	4. send a sessionReady event back to the client
+
+
+

@@ -21,13 +21,13 @@ module.exports = function(io) {
 		var sessions = db.get('sessions');
 		
 		//TODO: weird ass workaround
-		if(session.current_users_names!=null) {
-			if(!(session.current_users_names.constructor===Array)) {
-				session.current_users_names = [session.current_users_names];
+		if(session.current_users!=null) {
+			if(!(session.current_users.constructor===Array)) {
+				session.current_users = [session.current_users];
 			}
 		}
 		else {
-			session.current_users_names = [];
+			session.current_users = [];
 		}
 		
 		if(session.queue!=null) {
