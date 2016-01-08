@@ -76,8 +76,8 @@ io.on('connection', function (socket) {
     socket.loggedIn = false;
 
     socket.on('sendinfo', function(info) {
-        console.log('user sent info: ' + info.user + " " + info.sessionId);
-        socket.user = info.user;
+        console.log('user sent info: ' + info.user.name + " " + info.sessionId);
+        socket.user = info.user.name;
         socket.sessionId = info.sessionId;
         socket.loggedIn = true;
         //user is added locally TODO: find best practices threading issues

@@ -30,16 +30,20 @@ $(document).ready(function(){
 });
 
 /* =============== GLOBAL VARIABLES ================= */
-var COLORS = ["green","red","blue","orange","teal"];
-var session;
-//name and master
-var mUser = {};
-var sessionInitialized = false;
-var player;
-var player_ready = false;
-var PLAYING = 1;
-var PAUSED = 2;
-var mSocket;
+var mConstants = {
+	"COLORS" : ["green","red","blue","orange","teal"],
+	"PLAYING" : 1,
+	"PAUSED" : 2
+};
+
+var mGlobals = {
+	sessionInitialized : false,
+	player_ready : false,
+	socket : {},
+	player : {},
+	user : {},
+	session : {}
+};
 
 /* ================== UI FUNCTIONS ================== */
 
@@ -49,11 +53,11 @@ function genreClicked() {
 }
 
 function onPlayerReady(event) {
-	player_ready = true;
+	mGlobals.player_ready = true;
 }
 
 function onYouTubeIframeAPIReady() {
-	player = new YT.Player('youtubeplayer', {
+	mGlobals.player = new YT.Player('youtubeplayer', {
         height: '270',
         width: '400',
         playerVars: {
@@ -71,8 +75,8 @@ function onYouTubeIframeAPIReady() {
 function updateQueueUI() {
 	var queueList = document.getElementById('list_queue');
 	queueList.innerHTML = "";
-	var queue = session.queue;
-	for(var i=0;i<queue.length;i++) {
+	var queue = mGlobals.session.queue;
+	for(var i=mGlobals.user.queue_position;i<queue.length;i++) {
 		//TODO : JSON issues
 		var recommendation = JSON.parse(queue[i]);
 		var innerht = "<li><div><img src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
@@ -83,11 +87,11 @@ function updateQueueUI() {
 function updateUsersList() {
 	var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
-	var users = session.current_users_names;
+	var users = mGlobals.session.current_users_names;
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
-		var color = COLORS[i%COLORS.length];
-		var innerht = '<span class="span_user" style="border-bottom:1px solid '+color+';">'+user+'</span><br><br>';
+		var color = mConstants.COLORS[i%mConstants.COLORS.length];
+		var innerht = '<span class="span_user" style="border-bottom:1px solid '+color+';">'+user.name+'</span><br><br>';
 		usersList.innerHTML += innerht;
 	}
 }
@@ -98,27 +102,27 @@ function clearSearchResults() {
 }
 
 function updatePlayerUI(current_video, current_video_time, current_recommender_name) {
-	while(!player_ready) {}
-	player.loadVideoById(current_video, current_video_time, "large");	
+	while(!mGlobals.player_ready) {}
+	mGlobals.player.loadVideoById(current_video, current_video_time, "large");	
 	$("#p_recommender").text("Recommended by " + current_recommender_name);
 	var color = 'black';
-	var users = session.current_users_names;
+	var users = mGlobals.session.current_users_names;
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		if(user===current_recommender_name) {
-			color = COLORS[i % COLORS.length];
+			color = mConstants.COLORS[i % mConstants.COLORS.length];
 		}
 	}
 	$("#p_recommender").css("border-bottom", "1px solid " + color);
 }
 
 function updatePlayerState(state) {
-	if(player_ready) {
-		if(state==PLAYING) {
-			player.playVideo();
+	if(mGlobals.player_ready) {
+		if(state==mConstants.PLAYING) {
+			mGlobals.player.playVideo();
 		}
-		else if(state==PAUSED) {
-			player.pauseVideo();
+		else if(state==mConstants.PAUSED) {
+			mGlobals.player.pauseVideo();
 		}
 	}
 }
@@ -132,24 +136,22 @@ function onPlayerStateChange(event) {
 }
 
 function nextPlayerVideo(first) {
-	var video_time = 0;
-	if(mUser.master) {
-		var started = popFromQueue();
-		if(started) {
-			updatePlayerUI(session.current_video, video_time, session.current_recommender_name);
-		}
-		else {
-			$("#p_recommender").text("Queue up a song!");
-			$("#p_recommender").css("border-bottom", "1px solid black");
-			waiting = true;
-		}
+	mGlobals.user.video_time = 0;
+
+	var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
+	var queue = mGlobals.user.queue_position;
+
+	if(queue_position<queue.length) {
+		//TODO: JSON issues
+		var recommendation = JSON.parse(queue[queue_position]);
+		updateQueueUI();
+		updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);
+		return true;
 	}
-	//not the master, there should always be a current_video
 	else {
-		if(first) {
-			video_time = session.current_video_time;
-		}	
-		updatePlayerUI(session.current_video, video_time, session.current_recommender_name);
+		$("#p_recommender").text("Queue up a song!");
+		$("#p_recommender").css("border-bottom", "1px solid black");
+		return false;
 	}
 }
 
@@ -174,7 +176,6 @@ function searchVideos() {
 }
 
 function queueSelectedVideo(elmnt) {
-
 	clearSearchResults();
 	var recommendation = {};
 
@@ -185,26 +186,20 @@ function queueSelectedVideo(elmnt) {
 	recommendation.videoID = videoID;
 	recommendation.title = title;
 	recommendation.thumb_URL = thumb_URL;
-	recommendation.recommender_name = mUser.name;
+	recommendation.recommender_name = mGlobals.user.name;
 
 	//TODO: JSON issues
-	session.queue.push(JSON.stringify(recommendation));
-	
-	console.log(session);
+	mGlobals.session.queue.push(JSON.stringify(recommendation));
 
 	saveSession(function() {
 		updateQueueUI();
-		if(mUser.master && waiting) {
-			waiting = false;
-			nextPlayerVideo(true);
+		if(mGlobals.user.waiting) {
+			mGlobals.user.waiting = nextPlayerVideo(true);
 		}
 	});
 }
 
-function createSession(sessionName) {
-
-}
-
+//TODO: better query (on server side)
 function queryForSession(sessionName, callbackFunction) {
 	$.ajax({
 		dataType : "json",
@@ -212,7 +207,7 @@ function queryForSession(sessionName, callbackFunction) {
 		success: function(data) {
 			$.each(data, function() {
 				if(this.name===sessionName) {
-					session = this;
+					mGlobals.session = this;
 					callbackFunction();
 				}
 			});
@@ -226,25 +221,28 @@ function queryForSession(sessionName, callbackFunction) {
 
 function getSession(sessionName) {
 	queryForSession(sessionName, function() {
-		if(session.current_users_names.length>0) {
-			mUser.master = false;
-		}
-		else {
-			console.log('user is master');
-			mUser.master = true;
-		}
-		mSocket = io();
-		var data = {
-			user : mUser,
-			sessionId : session._id
+
+		//TODO: threading
+		mGlobals.user.sessionIdx = mGlobals.session.current_users.length;
+
+		mGlobals.socket = io();
+		var socketData = {
+			user : mGlobals.user,
+			sessionId : mGlobals.session._id
 		};
-		mSocket.emit('sendinfo', data);
-		session.current_users_names.push(mUser);
+		mGlobals.socket.emit('sessionLogin', socketData);
+
+		//TODO: JSON issues
+		mGlobals.session.current_users.push(JSON.stringify(mGlobals.user);
+
 		saveSession();
-		sessionInitialized = true;
+		
+		mGlobals.sessionInitialized = true;
+
 		synchronize();
 		setInterval(synchronize, 5000);
-		nextPlayerVideo(true);
+
+		mGlobals.user.waiting = nextPlayerVideo(true);
 		$("#div_music").fadeIn(1000);	
 	});	
 }
@@ -253,7 +251,7 @@ function saveSession(callbackFunc) {
 	$.ajax({
 		type: 'POST',
 		url: '/savesession',
-		data: session, 
+		data: mGlobals.session, 
 		dataType: "json",
 		traditional: true,
 		timeout: 3000,
@@ -269,58 +267,37 @@ function saveSession(callbackFunc) {
 }
 
 function synchronize() {
-	console.log('attempting to synchronize');
-	if(sessionInitialized) {
-		queryForSession(session.name, function() {
+	if(mGlobals.sessionInitialized) {
+		queryForSession(mGlobals.session.name, function() {
 			updateQueueUI();
-			updateUsersList();
-			if(!mUser.master) {
-				updatePlayerState(session.player_state);
-			}
-			else {
-				if(player_ready) {
-					console.log('updating time: ' + player.getCurrentTime());
-					session.current_video_time = player.getCurrentTime();
-					console.log(session.current_video_time);
-					session.player_state = player.getPlayerState();
-					saveSession();		
-				}				
-			}				
+			updateUsersList();	
+			//TODO: really not sure if this works!
+			console.log(mGlobals.session.users[mGlobals.user.sessionIdx]);
+			mGlobals.session.users[mGlobals.user.sessionIdx] = mGlobals.user;
+			console.log(mGlobals.session.users[mGlobals.user.sessionIdx]);
 		});
 	}
 }
 
-function enterJamSession() {
-	$("#div_genre").hide();
-	mUser.name = $("#txt_name_join").val();
-	getSession($("#txt_group_join").val());
+function TempUser(nickname) {
+	this.temp = true;
+	this.nickname = nickname;
+	this.queue_position = -1;
+	this.video_time = -1;
+	this.player_state = -1;
 }
 
-function popFromQueue() {
-	var queue = session.queue;
-	if(queue.length>0) {
-		var recommendation = JSON.parse(queue[0]);
-		session.current_video = recommendation.videoID;
-		session.current_video_time = 0;
-		session.current_recommender_name = recommendation.recommender_name;
-		//TODO: make cleaner
-		for(var i=0;i<session.queue.length;i++) {
-			if(session.queue[i].videoID = recommendation.videoID) {
-				session.queue.splice(i,1);		
-			}
-		}
-		saveSession();
-		updateQueueUI();
-		return true;
-	}
-	return false;
+function enterJamSession() {
+	$("#div_genre").hide();
+	
+	var nickname = $("#txt_name_join").val();
+	var sessionName = $("#txt_group_join").val(); 
+
+	mGlobals.sessionUser = new TempUser(nickname);
+	getSession(sessionName);
 }
 
 function youtubeAPIInit() {
 	gapi.client.setApiKey("AIzaSyAinPSDrNl9ols4DgE9XjHM8gcuJKZ7D1E");
 	gapi.client.load("youtube", "v3");
-}
-
-function socketioLoad() {
-
 }
