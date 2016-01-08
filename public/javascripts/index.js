@@ -67,22 +67,19 @@ function onPlayerReady(event) {
 	mGlobals.player_ready = true;
 }
 
-function updateQueueUI() {
+function updateQueueUI(queue) {
 	var queueList = document.getElementById('list_queue');
 	queueList.innerHTML = "";
-	var queue = mGlobals.session.queue;
-	for(var i=mGlobals.user.queue_position;i<queue.length;i++) {
-		//TODO : JSON issues
-		var recommendation = JSON.parse(queue[i]);
+	for(var i=queue;i<queue.length;i++) {
+		var recommendation = queue[i];
 		var innerht = "<li><div><img src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
 		queueList.innerHTML += innerht;
 	}
 }
 
-function updateUsersList() {
+function updateUsersListUI(users) {
 	var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
-	var users = getUsersFromDatabase(mGlobals.session.current_users);
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		var color = mConstants.COLORS[i%mConstants.COLORS.length];
@@ -107,10 +104,11 @@ function nextVideoInQueue(first) {
 	var queue = mGlobals.user.queue_position;
 
 	if(queue_position<queue.length) {
-		//TODO: JSON issues
-		var recommendation = JSON.parse(queue[queue_position]);
-		updateQueueUI();
-		updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);
+		var recommendationId = queue[queue_position];
+		fetchRecommendationFromDatabase(recommendationId, function(recommendation) {
+			updateQueue();
+			updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);	
+		});
 		return true;
 	}
 	else {
@@ -157,7 +155,7 @@ function updateUser(user) {
 
 function updateSession(session) {
 	mGlobals.session = session;
-	updateQueueUI();
+	updateQueue();
 	updateUsersList();
 	if(mGlobals.user.waiting) {
 		nextVideoInQueue(true);
@@ -170,6 +168,58 @@ function sessionReady(session) {
 	setInterval(saveUserVideoState, 10000);
 	mGlobals.user.waiting = nextVideoInQueue(true);
 	enterJamSessionUI();
+}
+
+function updateQueue() {
+	jQuery.ajax({
+		type : 'GET',
+		url : '/fetchqueue',
+		data : JSON.stringify(mGlobals.session.queue),
+		dataType : 'json',
+		success : function(data) {
+			//TODO: JSON issues
+			var queue = data; //JSON.parse(data);
+			updateQueueUI(queue);
+		},
+		error: function() {
+			console.log('error getting queue from database');
+		}
+	});
+}
+
+function updateUsersList() {
+	jQuery.ajax({
+		type : 'GET',
+		url : '/fetchusersinsession',
+		data : JSON.stringify(mGlobals.session.current_users),
+		dataType : 'json',
+		success : function(data) {
+			//TODO: JSON issues
+			var current_users = data; //JSON.parse(data);
+			updateUsersListUI(current_users);
+		},
+		error: function() {
+			console.log('error getting user list from database');
+		}
+	});
+}
+
+function fetchRecommendationFromDatabase(recommendationId, callbackFunc) {
+	jQuery.ajax({
+		type : 'GET',
+		url : '/fetchrecommendation',
+		data : recommendationId,
+		dataType : 'json',
+		success : function(data) {
+			var recommendation = data;
+			if(!(callbackFunc===null)) {
+				callbackFunc(recommendation);
+			}
+		},
+		error: function() {
+			console.log('error getting user list from database');
+		}
+	});
 }
 
 //starts the whole shebang
