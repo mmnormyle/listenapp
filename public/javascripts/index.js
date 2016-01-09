@@ -69,11 +69,16 @@ function onPlayerReady(event) {
 	mGlobals.player_ready = true;
 }
 
-function updateQueueUI(queue) {
+function updateQueueUI() {
+	var next_queue_position = mGlobals.user.queue_position + 1;
+	var queue = mGlobals.queue;
 	var queueList = document.getElementById('list_queue');
 	queueList.innerHTML = "";
-	for(var i=queue;i<queue.length;i++) {
+	console.log(queue);
+	for(var i=next_queue_position;i<queue.length;i++) {
 		var recommendation = queue[i];
+		console.log(i + " " + queue.length);
+		console.log('recommendation: ' + recommendation);
 		var innerht = "<li><div><img src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
 		queueList.innerHTML += innerht;
 	}
@@ -99,22 +104,22 @@ function clearSearchResults() {
 // Backend video and queue control functions
 //==================================================================
 
-function nextVideoInQueue(first) {
+function nextVideoInQueue() {
 	mGlobals.user.video_time = 0;
-
-	var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
 	var queue = mGlobals.queue;
-
-	if(queue_position<queue.length) {
+	if((mGlobals.user.queue_position+1)<queue.length) {
+		var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
+		console.log('queuepos: ' + queue_position);
+		console.log('queue len: ' + queue.length);
 		var recommendation = queue[queue_position];
-		updateQueue();
+		updateQueueUI(mGlobals.queue, mGlobals.user.queue_position);
 		updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);	
-		return true;
+		mGlobals.user.waiting = false;
 	}
 	else {
 		$("#p_recommender").text("Queue up a song!");
 		$("#p_recommender").css("border-bottom", "1px solid black");
-		return false;
+		mGlobals.user.waiting = true;
 	}
 }
 
@@ -123,13 +128,13 @@ function queueSelectedVideo(elmnt) {
 	var videoId = elmnt.getAttribute('data-videoId');
 	var title = elmnt.innerText || element.textContent;
 	var thumb_url = elmnt.getAttribute('data-thumb_URL');
-	var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user._id, mGlobals.user._id);
+	var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user._id, mGlobals.user.name);
 	var data = {
-		sessionId : mGlobals.session._id,
+		sessionId : mGlobals.sessionId,
 		recommendation : recommendation
-	}
+	};
 	//TODO: local add recommendation
-	socket.emit('addRecommendationToSession', data);
+	mGlobals.socket.emit('addRecommendationToSession', data);
 }
 
 //==================================================================
@@ -137,9 +142,11 @@ function queueSelectedVideo(elmnt) {
 // Basically all the hard stuff
 //==================================================================
 function saveUserVideoState() {
-	mGlobals.user.video_time = mGlobals.player.getCurrentTime();
-	mGlobals.user.player_state = mGlobals.player.getPlayerState();
-	mGlobals.socket.emit('saveUserVideoState', mGlobals.user);
+	if(mGlobals.player_ready) {
+		mGlobals.user.video_time = mGlobals.player.getCurrentTime();
+		mGlobals.user.player_state = mGlobals.player.getPlayerState();
+		mGlobals.socket.emit('saveUserVideoState', mGlobals.user);	
+	}
 }
 
 function setupSocketEvents() {
@@ -155,15 +162,18 @@ function updateUsersList(users) {
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	
-	}
+	}		
 }
 
 function updateQueue(queue) {
-	console.log('updateQueue');
 	queue = JSON.parse(queue);
+	console.log(queue);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
-		updateQueueUI(mGlobals.queue);	
+		updateQueueUI();	
+		if(mGlobals.user.waiting) {
+			nextVideoInQueue();
+		}
 	}
 }
 
@@ -176,12 +186,15 @@ function updateUser(user) {
 
 function sessionReady(data) {
 	console.log('sessionReady');
-	mGlobals.sessionId = data.session._id;
+	mGlobals.sessionId = data.sessionId;
 	mGlobals.queue = data.queue;
 	mGlobals.current_users = data.current_users;
+	if(mGlobals.user.temp) {
+		mGlobals.user = data.user;
+	}
 	saveUserVideoState();
 	setInterval(saveUserVideoState, 10000);
-	mGlobals.user.waiting = nextVideoInQueue(true);
+	nextVideoInQueue();
 	updateUsersListUI(mGlobals.current_users);
 	enterJamSessionUI();
 	mGlobals.sessionInitialized = true;
@@ -263,7 +276,7 @@ function updatePlayerState(state) {
 function onPlayerStateChange(event) {
 	//when video ends
     if(event.data==0) {
-    	nextVideoInQueue(false);
+    	nextVideoInQueue();
     }
 }
 
@@ -273,6 +286,7 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 	$("#p_recommender").text("Recommended by " + current_recommender_name);
 	var color = 'black';
 	var users = mGlobals.current_users;
+	//TODO: better way of colors
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		if(user.name===current_recommender_name) {

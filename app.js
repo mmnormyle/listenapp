@@ -7,6 +7,7 @@ var bodyParser = require('body-parser');
 
 var mongo = require('mongodb');
 var monk = require('monk');
+var ObjectID = mongo.ObjectID;
 var db = monk('localhost:27017/test')
 
 var app = express();
@@ -70,7 +71,7 @@ app.use(function(err, req, res, next) {
 });
 
 function fetchSession(params, callback) {
-    console.log('fetchSession');
+    console.log('fetchSession: ' + params._id);
     var query = {};
     if(params.hasOwnProperty("_id")) {
         query._id = params._id;
@@ -88,6 +89,21 @@ function fetchSession(params, callback) {
         }
         else {
             console.log("couldn't find session");
+        }
+    });
+}
+
+function addRecommendationToSession(sessionId, recommendationId, callback) {
+    console.log('addUserToSession');
+    var sessions = db.get('sessions');
+    fetchSession({_id : sessionId}, function(session) {
+        var queue = session.queue;
+        queue.push(recommendationId);
+        sessions.updateById(sessionId, {$set : {'queue':queue}}, function(err) {
+            console.log(err===null ? 'successfully updated queue' : 'error updating queue');
+        });
+        if(callback) {
+            callback();
         }
     });
 }
@@ -110,13 +126,16 @@ function addUserToSession(sessionId, userId, callback) {
 function removeUserFromSession(sessionId, user, callback) {
     console.log('removeUserFromSession');
     var sessions = db.get('sessions');
-    sessions.find({_id : sessionId},{},function(e,results) {
-        var success;
-        if(results.length>0) {
-            console.log("Found session");
-            var session = results[0];
-            var current_user_ids = session.current_user_ids;
-            current_user_ids.splice(current_user_ids.indexOf(user._id), 1);
+    fetchSession({_id : sessionId}, function(session) {
+        var current_user_ids = session.current_user_ids;
+        var index = -1;
+        for(var i=0;i<current_user_ids.length;i++) {
+            if(current_user_ids[i].equals(user._id)) {
+                index = i;
+            }
+        }
+        if(index!==-1) {
+            current_user_ids.splice(index, 1);   
             sessions.updateById(sessionId, {$set : {'current_user_ids':current_user_ids}}, function(err) {
                 console.log(err===null ? 'successfully updated session users' : 'error updating session users');
             });
@@ -124,16 +143,11 @@ function removeUserFromSession(sessionId, user, callback) {
             if(current_user_ids.length==0) {
                 //cleanupSession(sessionId)
             }
-            success = true;
-        }
-        else {
-            console.log("Couldn't find session.");
-            success = false;
         }
         if(callback) {
-            callback(success);
-        }
-    });
+            callback();
+        } 
+    })
 }
 
 //TODO: this is probably to good to be true
@@ -160,6 +174,7 @@ function fetchUserList(user_ids, callback) {
 //TODO: this is probably to good to be true
 function fetchQueue(queue_ids, callback) {
     console.log('fetchQueue');
+    console.log(queue_ids);
     var queue = [];
     db.get('recommendations').find({"_id" : {"$in" : queue_ids}}, function(err, docs) {
         for(var i=0;i<queue_ids.length;i++) {
@@ -169,10 +184,11 @@ function fetchQueue(queue_ids, callback) {
                     index = j;
                 }
             }
-            queue[i] = docs[index];
-            docs.splice(index,1);
+            if(index!==-1) {    
+                queue[i] = docs[index];
+                docs.splice(index,1);   
+            }
         }
-        console.log(queue);
         if(callback) {
             callback(queue);
         }
@@ -182,10 +198,21 @@ function fetchQueue(queue_ids, callback) {
 function clientsUpdateSessionUsers(sessionId) {
     console.log('clientsUpdateSessionUsers');
     fetchSession({
-        sessionId : sessionId
+        _id : sessionId
     }, function(session) {
         fetchUserList(session.current_user_ids, function(users) {
             io.emit('updateUsersList', JSON.stringify(users));
+        });
+    });
+}
+
+function clientsUpdateSessionQueue(sessionId) {
+    console.log('clientsUpdateSessionQueue');
+    fetchSession({
+        _id : sessionId
+    }, function(session) {
+        fetchQueue(session.queue, function(queue) {
+            io.emit('updateQueue', JSON.stringify(queue));
         });
     });
 }
@@ -202,17 +229,31 @@ function saveTempUser(user, callback) {
     });
 }
 
-function clientSessionReady(socket) {
+function saveRecommendation(recommendation, callback) {
+    console.log('saveRecommendation');
+    db.get('recommendations').insert(recommendation, function(err, doc) {
+        if(err) {
+            throw err;
+        }
+        if(callback) {
+            callback(doc);
+        }
+    });
+}
+
+
+function clientSessionReady(socket, user) {
     console.log('clientSessonReady');
     var data = {};
     fetchSession({
         _id : socket.sessionId
     }, function(sessionFound) {
-        data.session = sessionFound;
+        data.sessionId = sessionFound._id;
         fetchUserList(sessionFound.current_user_ids, function(users) {
             data.current_users = users;
             fetchQueue(sessionFound.queue, function(queue) {
                 data.queue = queue;
+                data.user = user;
                 socket.emit('sessionReady', data);
             });
         })
@@ -237,7 +278,7 @@ io.on('connection', function (socket) {
                     var session = sessionFound;
                     socket.sessionId = session._id;
                     addUserToSession(socket.sessionId, saved_user._id, function() {
-                        clientSessionReady(socket);
+                        clientSessionReady(socket, saved_user);
                         socket.loggedIn = true;
                         clientsUpdateSessionUsers(socket.sessionId);
                     });
@@ -247,6 +288,18 @@ io.on('connection', function (socket) {
         else {
             //TODO: non temp users
         }
+    });
+
+    socket.on('addRecommendationToSession', function(data) {
+        console.log('addRecommendationToSession');
+        //TODO: JSON
+        var sessionId = ObjectID(data.sessionId);
+        var recommendation = data.recommendation;
+        saveRecommendation(recommendation, function(saved_recommendation) {
+            addRecommendationToSession(sessionId, recommendation._id, function() {
+                clientsUpdateSessionQueue(socket.sessionId);
+            });
+        });
     });
 
     socket.on('disconnect', function() {
