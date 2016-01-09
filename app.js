@@ -101,54 +101,20 @@ function createSession(sessionName, callback) {
 // need to destroy temp users
 //
 function cleanupSession(sessionId, callback) {
-    fetchSession({_id : sessionId}, function(session) {
-        deleteTempUsers(session.current_user_ids, function() {
-            var sessions = db.collection('sessions');
-            sessions.deleteOne({_id : sessionId}, function(err, result) {
-                if(err) {
-                    throw err;
-                }
-                else {
-                    console.log('Deleted session with id: ' + sessionId);
-                }
-                if(callback) {
-                    callback();
-                }
-            });
-        });
-    });
-}
-
-function deleteTempUsers(userIds, callback) {
-    var tempIds = [];
-    fetchUserList(userIds, function(users) {
-        for(var i=0;i<users.length;i++) {
-            if(users[i].temp) {
-                tempIds.push(users[i]._id);
+    db.collection('users').deleteMany({"temp" : true, "in_session" : sessionId}, function(err, results) {
+        db.collection('sessions').deleteOne({_id : sessionId}, function(err, result) {
+            if(err) {
+                throw err;
             }
-        }
-        deleteUserList(tempIds, function() {
+            else {
+                console.log('Deleted session with id: ' + sessionId);
+            }
             if(callback) {
                 callback();
             }
-        })
-    });
+        });
+    });    
 }
-
-function deleteUserList(userIds, callback) {
-    db.collection('sessions').delete({"_id" : {"$in" : user_ids}}, function(err, results) {
-        if(err) {
-            throw err;
-        }
-        else {
-            console.loe('deleted user list');
-        }
-        if(callback) {
-            callback();
-        }
-    });
-}
-
 
 function fetchSession(params, callback) {
     var sessions = db.collection('sessions');
@@ -287,7 +253,7 @@ function clientsUpdateSessionUsers(sessionId) {
         _id : sessionId
     }, function(session) {
         fetchUserList(session.current_user_ids, function(users) {
-            io.emit('updateUsersList', JSON.stringify(users));
+            io.to(session.name).emit('updateUsersList', JSON.stringify(users));
         });
     });
 }
@@ -297,12 +263,13 @@ function clientsUpdateSessionQueue(sessionId) {
         _id : sessionId
     }, function(session) {
         fetchQueue(session.queue, function(queue) {
-            io.emit('updateQueue', JSON.stringify(queue));
+            io.to(session.name).emit('updateQueue', JSON.stringify(queue));
         });
     });
 }
 
-function saveTempUser(user, callback) {
+function saveTempUser(user, sessionId, callback) {
+    user.in_session = sessionId;
     db.collection('users').insert(user, function(err, results) {
         var doc = results.ops[0];
         if(err) {
@@ -355,8 +322,9 @@ io.on('connection', function (socket) {
         socket.user = data.user;
 
         var onSessionFound = function(session) {
+            socket.join(session.name);
             socket.sessionId = session._id;
-            saveTempUser(socket.user, function(saved_user) {
+            saveTempUser(socket.user, socket.sessionId, function(saved_user) {
                 addUserToSession(socket.sessionId, saved_user._id, function() {
                     clientSessionReady(socket, saved_user);
                     socket.loggedIn = true;
