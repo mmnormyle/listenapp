@@ -159,6 +159,7 @@ function setupSocketEvents() {
 
 function updateUsersList(users) {
 	users = JSON.parse(users);
+	console.log(users);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	

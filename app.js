@@ -5,14 +5,20 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var mongo = require('mongoskin');
-// var monk = require('monk');
-var ObjectID = mongo.ObjectID;
-// var mongoURI = 'localhost:27017/test';
-var mongoURI = 'mongodb://heroku_79ppwm8w:ukjk27neus5srnmgct700bvogt@ds039165.mongolab.com:39165/heroku_79ppwm8w';
-// var db = monk(mongoURI || process.env.MONGOLAB_URI);
+var mongoURI = 'mongodb://localhost:27017/test';
+var ObjectID = require('mongodb').ObjectID;
+var MongoClient = require('mongodb').MongoClient;
+var db;
+MongoClient.connect((process.env.MONGOLAB_URI || mongoURI), function(err, ret_db) {
+    if(!err) {
+        console.log("Connected");
+        db = ret_db;
+    }
+    else {
+        throw err;
+    }
+})
 
-var db = require('monk')(mongoURI);
 
 var app = express();
 
@@ -75,35 +81,41 @@ app.use(function(err, req, res, next) {
 });
 
 function fetchSession(params, callback) {
-    console.log('fetchSession: ' + params._id);
-    var query = {};
+    var sessions = db.collection('sessions');
     if(params.hasOwnProperty("_id")) {
-        query._id = params._id;
-    }
-    else if(params.hasOwnProperty("name")) {
-        query.name = params.name;
-    }
-    var sessions = db.get('sessions');
-    sessions.find({query},function(e, results) {
-        if(results.length>0) {
-            var session = results[0];
-            if(callback) {
-                callback(session);
+        sessions.find({_id : params._id}).toArray(function(e, results) {
+            if(results.length>0) {
+                var session = results[0];
+                if(callback) {
+                    callback(session);
+                }
             }
-        }
-        else {
-            console.log("couldn't find session");
-        }
-    });
+            else {
+                console.log("couldn't find session");
+            }
+        });        
+    }
+    else {
+        sessions.find({name : params.name}).toArray(function(e, results) {
+            if(results.length>0) {
+                var session = results[0];
+                if(callback) {
+                    callback(session);
+                }
+            }
+            else {
+                console.log("couldn't find session");
+            }
+        });
+    }
 }
 
 function addRecommendationToSession(sessionId, recommendationId, callback) {
-    console.log('addUserToSession');
-    var sessions = db.get('sessions');
+    var sessions = db.collection('sessions');
     fetchSession({_id : sessionId}, function(session) {
         var queue = session.queue;
         queue.push(recommendationId);
-        sessions.updateById(sessionId, {$set : {'queue':queue}}, function(err) {
+        sessions.updateOne({_id : sessionId}, {$set : {'queue':queue}}, function(err) {
             console.log(err===null ? 'successfully updated queue' : 'error updating queue');
         });
         if(callback) {
@@ -113,12 +125,11 @@ function addRecommendationToSession(sessionId, recommendationId, callback) {
 }
 
 function addUserToSession(sessionId, userId, callback) {
-    console.log('addUserToSession');
-    var sessions = db.get('sessions');
+    var sessions = db.collection('sessions');
     fetchSession({_id : sessionId}, function(session) {
         var current_user_ids = session.current_user_ids;
         current_user_ids.push(userId);
-        sessions.updateById(sessionId, {$set : {'current_user_ids':current_user_ids}}, function(err) {
+        sessions.updateOne({_id : sessionId}, {$set : {'current_user_ids':current_user_ids}}, function(err) {
             console.log(err===null ? 'successfully updated session users' : 'error updating session users');
         });
         if(callback) {
@@ -128,8 +139,7 @@ function addUserToSession(sessionId, userId, callback) {
 }
 
 function removeUserFromSession(sessionId, user, callback) {
-    console.log('removeUserFromSession');
-    var sessions = db.get('sessions');
+    var sessions = db.collection('sessions');
     fetchSession({_id : sessionId}, function(session) {
         var current_user_ids = session.current_user_ids;
         var index = -1;
@@ -140,7 +150,7 @@ function removeUserFromSession(sessionId, user, callback) {
         }
         if(index!==-1) {
             current_user_ids.splice(index, 1);   
-            sessions.updateById(sessionId, {$set : {'current_user_ids':current_user_ids}}, function(err) {
+            sessions.updateOne({_id : sessionId}, {$set : {'current_user_ids':current_user_ids}}, function(err) {
                 console.log(err===null ? 'successfully updated session users' : 'error updating session users');
             });
             //TODO: may want to move this to make it more robust
@@ -156,9 +166,9 @@ function removeUserFromSession(sessionId, user, callback) {
 
 //TODO: this is probably to good to be true
 function fetchUserList(user_ids, callback) {
-    console.log('fetchUserList');
     var users = [];
-    db.get('users').find({"_id" : {"$in" : user_ids}}, function(err, docs) {
+    db.collection('users').find({"_id" : {"$in" : user_ids}}).toArray(function(err, results) {
+        var docs = results;
         for(var i=0;i<user_ids.length;i++) {
             var index = -1;
             for(var j=0;j<docs.length;j++) {
@@ -177,10 +187,9 @@ function fetchUserList(user_ids, callback) {
 
 //TODO: this is probably to good to be true
 function fetchQueue(queue_ids, callback) {
-    console.log('fetchQueue');
-    console.log(queue_ids);
     var queue = [];
-    db.get('recommendations').find({"_id" : {"$in" : queue_ids}}, function(err, docs) {
+    db.collection('recommendations').find({"_id" : {"$in" : queue_ids}}).toArray(function(err, results) {
+        var docs = results;
         for(var i=0;i<queue_ids.length;i++) {
             var index = -1;
             for(var j=0;j<docs.length;j++) {
@@ -200,7 +209,6 @@ function fetchQueue(queue_ids, callback) {
 }
 
 function clientsUpdateSessionUsers(sessionId) {
-    console.log('clientsUpdateSessionUsers');
     fetchSession({
         _id : sessionId
     }, function(session) {
@@ -211,7 +219,6 @@ function clientsUpdateSessionUsers(sessionId) {
 }
 
 function clientsUpdateSessionQueue(sessionId) {
-    console.log('clientsUpdateSessionQueue');
     fetchSession({
         _id : sessionId
     }, function(session) {
@@ -222,8 +229,8 @@ function clientsUpdateSessionQueue(sessionId) {
 }
 
 function saveTempUser(user, callback) {
-    console.log('saveTempUser');
-    db.get('users').insert(user, function(err, doc) {
+    db.collection('users').insert(user, function(err, results) {
+        var doc = results.ops[0];
         if(err) {
           throw err;
         }
@@ -234,8 +241,8 @@ function saveTempUser(user, callback) {
 }
 
 function saveRecommendation(recommendation, callback) {
-    console.log('saveRecommendation');
-    db.get('recommendations').insert(recommendation, function(err, doc) {
+    db.collection('recommendations').insert(recommendation, function(err, results) {
+        var doc = results.ops[0];
         if(err) {
             throw err;
         }
@@ -247,7 +254,6 @@ function saveRecommendation(recommendation, callback) {
 
 
 function clientSessionReady(socket, user) {
-    console.log('clientSessonReady');
     var data = {};
     fetchSession({
         _id : socket.sessionId
@@ -268,7 +274,6 @@ function clientSessionReady(socket, user) {
 io.on('connection', function (socket) {
   
     console.log('user connected');
-
     socket.loggedIn = false;
 
     socket.on('userJoinSession', function(data) {
@@ -281,6 +286,9 @@ io.on('connection', function (socket) {
                 }, function(sessionFound) {
                     var session = sessionFound;
                     socket.sessionId = session._id;
+                    console.log('saved user: ');
+                    console.log(saved_user);
+                    console.log('user id: ' + saved_user);
                     addUserToSession(socket.sessionId, saved_user._id, function() {
                         clientSessionReady(socket, saved_user);
                         socket.loggedIn = true;
