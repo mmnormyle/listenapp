@@ -80,6 +80,76 @@ app.use(function(err, req, res, next) {
     });
 });
 
+function createSession(sessionName, callback) {
+    var session = {
+        queue : [],
+        current_user_ids : [],
+        name : sessionName
+    };
+    db.collection('sessions').insert(session, function(err, results) {
+        var doc = results.ops[0];
+        if(err) {
+          throw err;
+        }
+        if(callback) {
+            callback(doc);
+        }
+    });
+}
+
+//
+// need to destroy temp users
+//
+function cleanupSession(sessionId, callback) {
+    fetchSession({_id : sessionId}, function(session) {
+        deleteTempUsers(session.current_user_ids, function() {
+            var sessions = db.collection('sessions');
+            sessions.deleteOne({_id : sessionId}, function(err, result) {
+                if(err) {
+                    throw err;
+                }
+                else {
+                    console.log('Deleted session with id: ' + sessionId);
+                }
+                if(callback) {
+                    callback();
+                }
+            });
+        });
+    });
+}
+
+function deleteTempUsers(userIds, callback) {
+    var tempIds = [];
+    fetchUserList(userIds, function(users) {
+        for(var i=0;i<users.length;i++) {
+            if(users[i].temp) {
+                tempIds.push(users[i]._id);
+            }
+        }
+        deleteUserList(tempIds, function() {
+            if(callback) {
+                callback();
+            }
+        })
+    });
+}
+
+function deleteUserList(userIds, callback) {
+    db.collection('sessions').delete({"_id" : {"$in" : user_ids}}, function(err, results) {
+        if(err) {
+            throw err;
+        }
+        else {
+            console.loe('deleted user list');
+        }
+        if(callback) {
+            callback();
+        }
+    });
+}
+
+
 function fetchSession(params, callback) {
     var sessions = db.collection('sessions');
     if(params.hasOwnProperty("_id")) {
@@ -91,7 +161,9 @@ function fetchSession(params, callback) {
                 }
             }
             else {
-                console.log("couldn't find session");
+                if(callback) {
+                    callback(false);
+                }
             }
         });        
     }
@@ -104,7 +176,9 @@ function fetchSession(params, callback) {
                 }
             }
             else {
-                console.log("couldn't find session");
+                if(callback) {
+                    callback(false);
+                }
             }
         });
     }
@@ -143,6 +217,7 @@ function removeUserFromSession(sessionId, user, callback) {
     fetchSession({_id : sessionId}, function(session) {
         var current_user_ids = session.current_user_ids;
         var index = -1;
+        var emptySession = false;
         for(var i=0;i<current_user_ids.length;i++) {
             if(current_user_ids[i].equals(user._id)) {
                 index = i;
@@ -153,13 +228,12 @@ function removeUserFromSession(sessionId, user, callback) {
             sessions.updateOne({_id : sessionId}, {$set : {'current_user_ids':current_user_ids}}, function(err) {
                 console.log(err===null ? 'successfully updated session users' : 'error updating session users');
             });
-            //TODO: may want to move this to make it more robust
             if(current_user_ids.length==0) {
-                //cleanupSession(sessionId)
+                emptySession = true;
             }
         }
         if(callback) {
-            callback();
+            callback(emptySession);
         } 
     })
 }
@@ -279,27 +353,30 @@ io.on('connection', function (socket) {
     socket.on('userJoinSession', function(data) {
         console.log('userJoinSession: ' + data.user.name + " " + data.sessionName);
         socket.user = data.user;
-        if(socket.user.temp) {
+
+        var onSessionFound = function(session) {
+            socket.sessionId = session._id;
             saveTempUser(socket.user, function(saved_user) {
-                fetchSession({
-                    name : data.sessionName
-                }, function(sessionFound) {
-                    var session = sessionFound;
-                    socket.sessionId = session._id;
-                    console.log('saved user: ');
-                    console.log(saved_user);
-                    console.log('user id: ' + saved_user);
-                    addUserToSession(socket.sessionId, saved_user._id, function() {
-                        clientSessionReady(socket, saved_user);
-                        socket.loggedIn = true;
-                        clientsUpdateSessionUsers(socket.sessionId);
-                    });
+                addUserToSession(socket.sessionId, saved_user._id, function() {
+                    clientSessionReady(socket, saved_user);
+                    socket.loggedIn = true;
+                    clientsUpdateSessionUsers(socket.sessionId);
                 });
-            });
-        }
-        else {
-            //TODO: non temp users
-        }
+            });   
+        };
+
+        fetchSession({
+            name : data.sessionName
+        }, function(sessionFound) {
+            if(sessionFound) {
+                onSessionFound(sessionFound);  
+            }
+            else {
+                createSession(data.sessionName, function(sessionCreate) {
+                    onSessionFound(sessionCreate);
+                });
+            }
+        });
     });
 
     socket.on('addRecommendationToSession', function(data) {
@@ -317,8 +394,13 @@ io.on('connection', function (socket) {
     socket.on('disconnect', function() {
         if(socket.loggedIn) {
             console.log("disconnect: " + socket.user.name);
-            removeUserFromSession(socket.sessionId, socket.user, function() {
-                clientsUpdateSessionUsers(socket.sessionId);
+            removeUserFromSession(socket.sessionId, socket.user, function(emptySession) {
+                if(!emptySession) {
+                    clientsUpdateSessionUsers(socket.sessionId);   
+                }
+                else {
+                    cleanupSession(socket.sessionId);
+                }
             });
         }   
     });
