@@ -1,23 +1,31 @@
 schema
 
 session:
-	name, current_users, queue
+	_id
+	name, current_user_ids, queue
 
 	name: string identifying the name of the session
-	current_users: array of session_user objects
-		session_user: user_objectId (correspoding to database user), video time, queue position, player state
-	queue: array of recommendation objects
+	current_users: array of user objects (just a list of their database Ids)
+	queue: array of recommendation object Ids
 		
 
 user:
-	temporary, name, password, recommendations
+	_id
+	temp, username, password, recommendations, name
+	stuff for session: sessionId, video time, queue position, player state
 
-	temporary: boolean
-	name: name of user
+	temporary: boolean indicating whether user is gu
+	username: username of user
 	password: need to figure out the best way to store this
-	recommendations: array of recommendations made by the user 
+	recommendations: array of recommendation object Ids made by user
+	(the below are only relevant when a user is in a session)
+	sessionId: session user is in 
+	video_time: current time of users video
+	queue_position: current queue position of user
+	player_state: current player state of user
+	waiting: is user waiting for a video
 
 recommendation:
-	user_objectID (whoever recommended), videoID, likes, dislikes
+	user_objectID (whoever recommended), videoID, likes, dislikes, thumb_url, recommender_name
 
 goals: clean up globals, clean up code and modularize it, refactor database to use above system, get rid of shitty master system

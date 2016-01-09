@@ -126,7 +126,7 @@ function queueSelectedVideo(elmnt) {
 	var recommendation = createRecommendation(title, videoId, thumb_url, mGlobals.user._id, mGlobals.user._id);
 	var data = {
 		sessionId : mGlobals.session._id,
-		recommendation : recommendation);
+		recommendation : recommendation
 	}
 	//TODO: local add recommendation
 	socket.emit('addRecommendationToSession', data);
@@ -137,41 +137,54 @@ function queueSelectedVideo(elmnt) {
 // Basically all the hard stuff
 //==================================================================
 function saveUserVideoState() {
-	mGlobals.user.video_time = player.getCurrentTime();
-	mGlobals.user.player_state = player.getcurrentState();
-	socket.emit('saveUserVideoState', mGlobals.user);
+	mGlobals.user.video_time = mGlobals.player.getCurrentTime();
+	mGlobals.user.player_state = mGlobals.player.getPlayerState();
+	mGlobals.socket.emit('saveUserVideoState', mGlobals.user);
 }
 
 function setupSocketEvents() {
 	//receives the newest user and session objects from database
-	socket.on('updateUser', updateUser(user));
-	socket.on('sessionReady', sessionReady(data));
-	socket.on('updateUsersList', updateUsersList(JSON.parse(users)));
-	socket.on('updateQueue', updateQueue(JSON.parse(queue)));
+	mGlobals.socket.on('updateUser', updateUser);
+	mGlobals.socket.on('sessionReady', sessionReady);
+	mGlobals.socket.on('updateUsersList', updateUsersList);
+	mGlobals.socket.on('updateQueue', updateQueue);
 }
 
 function updateUsersList(users) {
-	mGlobals.current_users = users;
-	updateUsersListUI(mGlobals.current_users);
+	users = JSON.parse(users);
+	if(mGlobals.sessionInitialized) {
+		mGlobals.current_users = users;
+		updateUsersListUI(mGlobals.current_users);	
+	}
 }
 
 function updateQueue(queue) {
-	mGlobals.queue = queue;
-	updateQueueUI(mGlobals.queue);
+	console.log('updateQueue');
+	queue = JSON.parse(queue);
+	if(mGlobals.sessionInitialized) {
+		mGlobals.queue = queue;
+		updateQueueUI(mGlobals.queue);	
+	}
 }
 
 function updateUser(user) {
-	mGlobals.user = user;
+	console.log('updateUser');
+	if(mGlobals.sessionInitialized) {
+		mGlobals.user = user;	
+	}
 }
 
 function sessionReady(data) {
+	console.log('sessionReady');
 	mGlobals.sessionId = data.session._id;
 	mGlobals.queue = data.queue;
 	mGlobals.current_users = data.current_users;
 	saveUserVideoState();
 	setInterval(saveUserVideoState, 10000);
 	mGlobals.user.waiting = nextVideoInQueue(true);
+	updateUsersListUI(mGlobals.current_users);
 	enterJamSessionUI();
+	mGlobals.sessionInitialized = true;
 }
 
 //starts the whole shebang
@@ -190,9 +203,7 @@ function enterJamSession() {
 		user : mGlobals.user,
 		sessionName : mGlobals.session.name
 	};
-	socket.emit('userLoginToSession', data);
-
-	storeTempUser(mGlobals.user, getSession(sessionName));
+	mGlobals.socket.emit('userJoinSession', data);
 }
 
 //==================================================================
@@ -288,7 +299,7 @@ function createRecommendation(title, videoId, thumb_url, userId, recommender_nam
 function createTempUser(nickname) {
 	var user = {};
 	user.temp = true;
-	user.name = name;
+	user.name = nickname;
 	user.queue_position = -1;
 	user.video_time = -1;
 	user.player_state = -1;

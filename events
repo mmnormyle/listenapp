@@ -1,12 +1,30 @@
 Sent by client:
 
-userLoginToSession 
-	triggered when client is logged in (maybe to temporary user) and wants to get into a session
+userJoinSession 
+	Triggered when client is logged in (maybe to temporary user) and wants to get into a session
+	Data sent:
+		user : user object (TODO: currently just a temp user without much besides a name)
+		sessionName : desired name of session (TODO: change to something more unique)
 	Server will:
 	1. create the session if it doesn't exist
 	2. save the user object to database if it is a temp user
 	3. sync up the session and user
 	4. send a sessionReady event back to the client
 
+addRecommendationToSession
+	Triggered when client adds a recommendation to queue
+	Data sent:
+		sessionId : id of session
+		recommendation : full recommendation object
+	Server will:
+	1. store the recommendation in database
+	2. sync up recommendation and session
+	3. send a sessionUpdate event
 
+saveUserVideoState
+	Triggered periodically by client in order to save queue position and video time
+	Data sent
+		user
+	Server will:
+	1. update the user in database
 
