@@ -5,10 +5,14 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var mongo = require('mongodb');
-var monk = require('monk');
+var mongo = require('mongoskin');
+// var monk = require('monk');
 var ObjectID = mongo.ObjectID;
-var db = monk('localhost:27017/test')
+// var mongoURI = 'localhost:27017/test';
+var mongoURI = 'mongodb://heroku_79ppwm8w:ukjk27neus5srnmgct700bvogt@ds039165.mongolab.com:39165/heroku_79ppwm8w';
+// var db = monk(mongoURI || process.env.MONGOLAB_URI);
+
+var db = require('monk')(mongoURI);
 
 var app = express();
 
