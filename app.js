@@ -192,16 +192,25 @@ function removeUserFromSession(sessionId, user, callback) {
         if(index!==-1) {
             current_user_ids.splice(index, 1);   
             sessions.updateOne({_id : sessionId}, {$set : {'current_user_ids':current_user_ids}}, function(err) {
-                console.log(err===null ? 'successfully updated session users' : 'error updating session users');
-            });
-            if(current_user_ids.length==0) {
-                emptySession = true;
-            }
+                if(current_user_ids.length==0) {
+                    emptySession = true;
+                }
+                if(user.temp) { 
+                    db.collection('users').deleteOne({_id : user._id}, function(err) {
+                        console.log(err===null ? 'successfully updated user session' : 'error updating user session');
+                        if(callback) {
+                            callback(emptySession);
+                        } 
+                    });   
+                }
+                else {
+                    if(callback) {
+                        callback(emptySession);
+                    } 
+                }
+            });    
         }
-        if(callback) {
-            callback(emptySession);
-        } 
-    })
+    });
 }
 
 //TODO: this is probably to good to be true
@@ -293,6 +302,19 @@ function saveRecommendation(recommendation, callback) {
     });
 }
 
+function saveUserVideoState(user) {
+    console.log('poop');
+    console.log(user.video_time);
+    db.collection('users').updateOne({_id : ObjectID(user._id)}, {$set : 
+        {
+            'player_state':user.player_state, 
+            'video_time':user.video_time, 
+            'queue_position':user.queue_position
+        }
+    }, function(err) {
+        console.log(err===null ? 'successfully updated user video state' : 'error updating user state');
+    });
+}
 
 function clientSessionReady(socket, user) {
     var data = {};
@@ -357,6 +379,13 @@ io.on('connection', function (socket) {
                 clientsUpdateSessionQueue(socket.sessionId);
             });
         });
+    });
+
+    socket.on('saveUserVideoState', function(data) {
+        console.log('saveUserVideoState');
+        var user = data;
+        console.log(user);
+        saveUserVideoState(user);
     });
 
     socket.on('disconnect', function() {

@@ -50,7 +50,6 @@ var mGlobals = {
 	current_users : []
 };
 
-
 //==================================================================
 // UI Functions
 //==================================================================
@@ -74,7 +73,6 @@ function updateQueueUI() {
 	var queue = mGlobals.queue;
 	var queueList = document.getElementById('list_queue');
 	queueList.innerHTML = "";
-	console.log(queue);
 	for(var i=next_queue_position;i<queue.length;i++) {
 		var recommendation = queue[i];
 		console.log(i + " " + queue.length);
@@ -90,14 +88,30 @@ function updateUsersListUI(users) {
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		var color = mConstants.COLORS[i%mConstants.COLORS.length];
-		var innerht = '<span class="span_user" style="border-bottom:1px solid '+color+';">'+user.name+'</span><br><br>';
+		var innerht = '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+';">'+user.name+'</span><br><br>';
 		usersList.innerHTML += innerht;
+	}
+}
+
+function syncWithUserUI(name) {
+	for(var i=0;i<mGlobals.current_users.length;i++) {
+		if(mGlobals.current_users[i].name===name) {
+			syncWithUser(mGlobals.current_users[i]);
+		}
 	}
 }
 
 function clearSearchResults() {
 	var searchList = document.getElementById('list_search_results');
 	searchList.innerHTML = "";
+}
+
+function setupVideo() {
+	if(mGlobals.user.queue_position!=-1) {
+		var recommendation = mGlobals.queue[mGlobals.user.queue_position];
+		updateQueueUI(mGlobals.queue, mGlobals.user.queue_position);
+		updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name);		
+	}
 }
 
 //==================================================================
@@ -109,11 +123,7 @@ function nextVideoInQueue() {
 	var queue = mGlobals.queue;
 	if((mGlobals.user.queue_position+1)<queue.length) {
 		var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position + 1;
-		console.log('queuepos: ' + queue_position);
-		console.log('queue len: ' + queue.length);
-		var recommendation = queue[queue_position];
-		updateQueueUI(mGlobals.queue, mGlobals.user.queue_position);
-		updatePlayerUI(recommendation.videoId, 0, recommendation.recommender_name);	
+		setupVideo();
 		mGlobals.user.waiting = false;
 	}
 	else {
@@ -141,11 +151,34 @@ function queueSelectedVideo(elmnt) {
 // Music Session setup and synchronization functions for session and user objects
 // Basically all the hard stuff
 //==================================================================
+
+function syncWithUser(user) {
+	mGlobals.user.queue_position = user.queue_position;
+	mGlobals.user.video_time = user.video_time;
+	mGlobals.user.player_state = user.player_state;
+	updateQueueUI();
+	setupVideo();
+}
+
+
 function saveUserVideoState() {
 	if(mGlobals.player_ready) {
 		mGlobals.user.video_time = mGlobals.player.getCurrentTime();
 		mGlobals.user.player_state = mGlobals.player.getPlayerState();
 		mGlobals.socket.emit('saveUserVideoState', mGlobals.user);	
+		$.ajax({
+			type : 'POST',
+			url : '/userlist',
+			data : {sessionId : mGlobals.sessionId},
+			dataType : 'json',
+			success: function(data) {
+				console.log('before:');
+				console.log(mGlobals.current_users);
+				mGlobals.current_users = data;
+				console.log('after:');
+				console.log(mGlobals.current_users);
+			}
+		});
 	}
 }
 
@@ -194,7 +227,7 @@ function sessionReady(data) {
 		mGlobals.user = data.user;
 	}
 	saveUserVideoState();
-	setInterval(saveUserVideoState, 10000);
+	setInterval(saveUserVideoState, 5000);
 	nextVideoInQueue();
 	updateUsersListUI(mGlobals.current_users);
 	enterJamSessionUI();
