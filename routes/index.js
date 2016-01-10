@@ -8,6 +8,10 @@ module.exports = function(io) {
 	  res.render('index', { title: 'Express' });
 	});
 
+	router.get(/rooms\/*/, function(req, res, next) {
+	  res.render('index', { title: 'Room' });
+	});
+
 	router.post('/userlist', function(req, res, next) {
 		var db = req.db;
 		var sessionId = ObjectID(req.body.sessionId);

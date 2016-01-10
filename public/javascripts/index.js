@@ -1,13 +1,24 @@
 $(document).ready(function(){
 
+	$("#div_genre").hide();
 	$("#div_music").hide();
 	$("#div_new_session").hide();
 	$("#div_unfinished").hide();
 
-	$(".genre_inner").hide();
-	$(".genre_inner").fadeIn(1000);
-	$(".genre_inner").click(genreClicked);
-	$("#txt_name_join").hide();
+	var pathname = window.location.pathname;
+	var roomName = null;
+	if(pathname.indexOf('\/rooms\/')>-1) {
+		roomName = pathname.replace('\/rooms/', '');
+	}
+
+	if(!roomName) {
+		$(".genre_inner").hide();
+		$("#div_genre").show();
+		$(".genre_inner").fadeIn(1000);
+		$(".genre_inner").click(genreClicked);
+		$("#txt_name_join").hide();	
+	}
+
 	$("#txt_name_join").keypress(function(e) {
 		if(e.which==13) {
 			enterJamSession();
@@ -27,6 +38,10 @@ $(document).ready(function(){
 		}
 	});
 
+	if(roomName) {
+		mGlobals.url_room = roomName;
+	}
+
 });
 
 
@@ -42,12 +57,15 @@ var mConstants = {
 var mGlobals = {
 	sessionInitialized : false,
 	player_ready : false,
+	url_room : null,
+	youtube_api_ready : false,
+	entered_jam : false,
 	socket : {},
 	player : {},
 	user : {},
 	session : {},
 	queue : [],
-	current_users : []
+	current_users : [],
 };
 
 //==================================================================
@@ -66,6 +84,9 @@ function genreClicked() {
 
 function onPlayerReady(event) {
 	mGlobals.player_ready = true;
+	if(mGlobals.url_room && mGlobals.youtube_api_ready) {
+		enterJamSession(mGlobals.url_room);
+	}
 }
 
 function updateQueueUI() {
@@ -75,8 +96,6 @@ function updateQueueUI() {
 	queueList.innerHTML = "";
 	for(var i=next_queue_position;i<queue.length;i++) {
 		var recommendation = queue[i];
-		console.log(i + " " + queue.length);
-		console.log('recommendation: ' + recommendation);
 		var innerht = "<li><div><img src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
 		queueList.innerHTML += innerht;
 	}
@@ -172,9 +191,7 @@ function saveUserVideoState() {
 			data : {sessionId : mGlobals.sessionId},
 			dataType : 'json',
 			success: function(data) {
-				console.log(mGlobals.current_users);
 				mGlobals.current_users = data;
-				console.log(mGlobals.current_users);
 			}
 		});
 	}
@@ -190,6 +207,7 @@ function setupSocketEvents() {
 
 function updateUsersList(users) {
 	users = JSON.parse(users);
+	console.log('updateUsersList: ');
 	console.log(users);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
@@ -199,6 +217,7 @@ function updateUsersList(users) {
 
 function updateQueue(queue) {
 	queue = JSON.parse(queue);
+	console.log('updateQueue: ');
 	console.log(queue);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
@@ -224,8 +243,9 @@ function sessionReady(data) {
 	if(mGlobals.user.temp) {
 		mGlobals.user = data.user;
 	}
+	console.log('about to save user video state');
 	saveUserVideoState();
-	setInterval(saveUserVideoState, 5000);
+	setInterval(saveUserVideoState, 10000);
 	nextVideoInQueue();
 	updateUsersListUI(mGlobals.current_users);
 	enterJamSessionUI();
@@ -233,16 +253,23 @@ function sessionReady(data) {
 }
 
 //starts the whole shebang
-function enterJamSession() {
+function enterJamSession(urlRoomName) {
+	if(mGlobals.entered_jam) {
+		return;
+	}
+	else {
+		mGlobals.entered_jam = true;
+	}
+
 	mGlobals.socket = io();
 	setupSocketEvents();
 	
-	var sessionName = $("#txt_group_join").val();
+	var sessionName = urlRoomName || $("#txt_group_join").val();
 	mGlobals.session.name = sessionName;
 
 	//TODO: better login flow
 	var name = $("#txt_name_join").val();
-	mGlobals.user = createTempUser(name);
+	mGlobals.user = createTempUser(name || 'Anonymous');
 
 	var data = {
 		user : mGlobals.user,
@@ -257,7 +284,12 @@ function enterJamSession() {
 
 function youtubeAPIInit() {
 	gapi.client.setApiKey("AIzaSyAinPSDrNl9ols4DgE9XjHM8gcuJKZ7D1E");
-	gapi.client.load("youtube", "v3");
+	gapi.client.load("youtube", "v3", function() {
+		mGlobals.youtube_api_ready = true;
+		if(mGlobals.url_room && mGlobals.player_ready) {
+			enterJamSession(mGlobals.url_room);
+		}
+	});
 }
 
 function onYouTubeIframeAPIReady() {
