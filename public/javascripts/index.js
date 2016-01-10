@@ -88,7 +88,7 @@ function updateUsersListUI(users) {
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		var color = mConstants.COLORS[i%mConstants.COLORS.length];
-		var innerht = '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+';">'+user.name+'</span><br><br>';
+		var innerht = '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name+'</span><br><br>';
 		usersList.innerHTML += innerht;
 	}
 }
@@ -172,10 +172,8 @@ function saveUserVideoState() {
 			data : {sessionId : mGlobals.sessionId},
 			dataType : 'json',
 			success: function(data) {
-				console.log('before:');
 				console.log(mGlobals.current_users);
 				mGlobals.current_users = data;
-				console.log('after:');
 				console.log(mGlobals.current_users);
 			}
 		});
