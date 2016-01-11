@@ -303,8 +303,6 @@ function saveRecommendation(recommendation, callback) {
 }
 
 function saveUserVideoState(user) {
-    console.log('poop');
-    console.log(user.video_time);
     db.collection('users').updateOne({_id : ObjectID(user._id)}, {$set : 
         {
             'player_state':user.player_state, 
@@ -313,6 +311,17 @@ function saveUserVideoState(user) {
         }
     }, function(err) {
         console.log(err===null ? 'successfully updated user video state' : 'error updating user state');
+    });
+}
+
+function saveUserNameChange(user, sessionId) {
+    db.collection('users').updateOne({_id : ObjectID(user._id)}, {$set : 
+        {
+            'name':user.name
+        }
+    }, function(err) {
+        console.log(err===null ? 'successfully updated user name' : 'error updating user name');
+        clientsUpdateSessionUsers(sessionId);
     });
 }
 
@@ -385,8 +394,14 @@ io.on('connection', function (socket) {
     socket.on('saveUserVideoState', function(data) {
         console.log('saveUserVideoState');
         var user = data;
-        console.log(user);
         saveUserVideoState(user);
+    });
+
+    socket.on('saveUserNameChange', function(data) {
+        var user = data.user;
+        var sessionId = socket.sessionId;
+        socket.user = data.user;
+        saveUserNameChange(user, sessionId);
     });
 
     socket.on('disconnect', function() {

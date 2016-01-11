@@ -4,6 +4,8 @@ $(document).ready(function(){
 	$("#div_music").hide();
 	$("#div_new_session").hide();
 	$("#div_unfinished").hide();
+	$("#txt_name_change").hide();
+	$("#chat_input").hide();
 
 	var pathname = window.location.pathname;
 	var roomName = null;
@@ -17,6 +19,12 @@ $(document).ready(function(){
 		$(".genre_inner").fadeIn(1000);
 		$(".genre_inner").click(genreClicked);
 		$("#txt_name_join").hide();	
+		$("#chat_input").show();
+	}
+	else {
+		$("chat_input").hide();
+		$("#txt_name_change").show();
+		mGlobals.url_room = roomName;
 	}
 
 	$("#txt_name_join").keypress(function(e) {
@@ -46,10 +54,11 @@ $(document).ready(function(){
 			sendChatMessage();		
 		}
 	});
-
-	if(roomName) {
-		mGlobals.url_room = roomName;
-	}
+	$("#txt_name_change").keypress(function(e) {
+		if(e.which==13) {
+			userNameChange();
+		}
+	});
 
 });
 
@@ -141,6 +150,13 @@ function setupVideo() {
 	}
 }
 
+function userNameChange() {
+	$("#txt_name_change").hide();
+	$("#chat_input").fadeIn(1000);
+	saveUserNameChange($("#txt_name_change").val());
+	$("#txt_name_change").hide();	
+}
+
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
@@ -185,6 +201,20 @@ function syncWithUser(user) {
 	mGlobals.user.player_state = user.player_state;
 	updateQueueUI();
 	setupVideo();
+}
+
+function saveUserNameChange(name) {
+	mGlobals.user.name = name;
+	for(var i=0;i<mGlobals.current_users;i++) {
+		if(mGlobals.user._id===mGlobals.current_users[i]._id) {
+			mGlobals.current_users[i].name = name;
+			console.log('wooooo');
+		}
+	}
+	var data = {
+		user : mGlobals.user
+	};
+	mGlobals.socket.emit('saveUserNameChange', data);
 }
 
 
