@@ -32,6 +32,9 @@ $(document).ready(function(){
 			$("#txt_name_join").select();
 		}
 	});
+	$("#txt_search_videos").click(function() {
+		$("#txt_search_videos").val("");
+	});
 	$("#txt_search_videos").keypress(function(e) {
 		if(e.which==13) {
 			searchVideos();
