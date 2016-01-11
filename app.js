@@ -346,6 +346,7 @@ io.on('connection', function (socket) {
         var onSessionFound = function(session) {
             socket.join(session.name);
             socket.sessionId = session._id;
+            socket.roomName = session.name;
             saveTempUser(socket.user, socket.sessionId, function(saved_user) {
                 addUserToSession(socket.sessionId, saved_user._id, function() {
                     clientSessionReady(socket, saved_user);
@@ -400,6 +401,14 @@ io.on('connection', function (socket) {
                 }
             });
         }   
+    });
+
+    socket.on('chatMessage', function(msg) {
+        var data = {
+            msg : msg,
+            user : socket.user
+        }
+        io.to(socket.roomName).emit('clientChatMessage', data);
     });
 
 });

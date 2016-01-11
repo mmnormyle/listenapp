@@ -41,6 +41,12 @@ $(document).ready(function(){
 		}
 	});
 
+	$("#chat_input").keypress(function(e) {
+		if(e.which==13) {
+			sendChatMessage();		
+		}
+	});
+
 	if(roomName) {
 		mGlobals.url_room = roomName;
 	}
@@ -52,7 +58,6 @@ $(document).ready(function(){
 // Global variables
 //==================================================================
 var mConstants = {
-	"COLORS" : ["green","red","blue","orange","teal"],
 	"PLAYING" : 1,
 	"PAUSED" : 2
 };
@@ -109,7 +114,7 @@ function updateUsersListUI(users) {
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
-		var color = mConstants.COLORS[i%mConstants.COLORS.length];
+		var color = user.color;
 		var innerht = '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name+'</span><br><br>';
 		usersList.innerHTML += innerht;
 	}
@@ -206,6 +211,14 @@ function setupSocketEvents() {
 	mGlobals.socket.on('sessionReady', sessionReady);
 	mGlobals.socket.on('updateUsersList', updateUsersList);
 	mGlobals.socket.on('updateQueue', updateQueue);
+	mGlobals.socket.on('clientChatMessage', receivedChatMessage);
+}
+
+function receivedChatMessage(data) {
+	var msg = data.msg;
+	var user = data.user;
+	var innerHTML = $('#messages').html() || "";
+	$('#messages').html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
 }
 
 function updateUsersList(users) {
@@ -282,6 +295,16 @@ function enterJamSession(urlRoomName) {
 }
 
 //==================================================================
+// Chat functions
+//==================================================================
+function sendChatMessage() {
+	if(mGlobals.sessionInitialized) {
+		mGlobals.socket.emit('chatMessage', $("#chat_input").val());
+		$("#chat_input").val("");
+	}
+}
+
+//==================================================================
 // Youtube API functions and player UI control
 //==================================================================
 
@@ -348,17 +371,18 @@ function onPlayerStateChange(event) {
 }
 
 function updatePlayerUI(current_video, current_video_time, current_recommender_name) {
-	while(!mGlobals.player_ready) {}
+	if(!mGlobals.player_ready) {
+		setTimeout(updatePlayerUI(current_video, current_video_time, current_recommender_name), 1000);
+	}
 	mGlobals.player.loadVideoById(current_video, current_video_time, "large");	
 	$("#p_recommender").text("Recommended by " + current_recommender_name);
 	var color = 'black';
-	var users = mGlobals.current_users;
-	//TODO: better way of colors
-	for(var i=0;i<users.length;i++) {
-		var user = users[i];
+	//TODO: shitty
+	for(var i=0;i<mGlobals.current_users.length;i++) {
+		var user = mGlobals.current_users[i];
 		if(user.name===current_recommender_name) {
-			color = mConstants.COLORS[i % mConstants.COLORS.length];
-		}
+			color = user.color;
+		} 
 	}
 	$("#p_recommender").css("border-bottom", "1px solid " + color);
 }
@@ -384,5 +408,18 @@ function createTempUser(nickname) {
 	user.queue_position = -1;
 	user.video_time = -1;
 	user.player_state = -1;
+	user.color = getRandomColor();
 	return user;
+}
+
+//==================================================================
+// Misc
+//==================================================================
+function getRandomColor() {
+    var letters = '0123456789ABCDEF'.split('');
+    var color = '#';
+    for (var i = 0; i < 6; i++ ) {
+        color += letters[Math.floor(Math.random() * 16)];
+    }
+    return color;
 }

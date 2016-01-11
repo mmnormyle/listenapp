@@ -167,5 +167,16 @@ body {
 	text-align: right;
 }
 
+#div_messages {
+	width: 100%;
+}
+
+#div_chat_input {
+	width: 100%;
+}
+
+#chat_input {
+	width: 100%;
+}
 
 
