@@ -325,6 +325,27 @@ function saveUserNameChange(user, sessionId) {
     });
 }
 
+var MAX_USERS = 10;
+
+function clientFindGenre(socket, genreName) {
+    var sessions = db.collection('sessions');
+    sessions.find({genre : genreName}).toArray(function(e, results) {
+        var found = false;
+        for(var i=0;(i<results.length && !found);i++) {
+            if(results[i].current_user_ids.length<MAX_USERS) {
+                socket.emit('foundGenreJam', {genreName : results[i].name});
+                found = true;
+            }
+        }   
+        if(!found) {
+            createSession(genreName + results.length, function(session) {
+                socket.emit('foundGenreJam', {genreName : session.name});
+            });
+        }
+    }
+
+}
+
 function clientSessionReady(socket, user) {
     var data = {};
     fetchSession({
@@ -402,6 +423,10 @@ io.on('connection', function (socket) {
         var sessionId = socket.sessionId;
         socket.user = data.user;
         saveUserNameChange(user, sessionId);
+    });
+
+    socket.on('findGenre', function(data) {
+        clientFindGenre(socket, data.genreName);
     });
 
     socket.on('disconnect', function() {

@@ -17,7 +17,7 @@ $(document).ready(function(){
 		$(".genre_inner").hide();
 		$("#div_genre").show();
 		$(".genre_inner").fadeIn(1000);
-		$(".genre_inner").click(genreClicked);
+		$(".genre_inner").click(genreClicked(this));
 		$("#txt_name_join").hide();	
 		$("#chat_input").show();
 	}
@@ -29,7 +29,7 @@ $(document).ready(function(){
 
 	$("#txt_name_join").keypress(function(e) {
 		if(e.which==13) {
-			enterJamSession();
+			setupJamSession();
 		}
 	});
 	$("#txt_group_join").keypress(function(e) {
@@ -94,9 +94,8 @@ function enterJamSessionUI() {
 	$("#div_music").fadeIn(1000);	
 }
 
-function genreClicked() {
-	$("#div_genre").hide();
-	$("#div_unfinished").fadeIn(1000);
+function genreClicked(genreButton) {
+	setupJamSession({genreName : $(genreButton).text()});
 }
 
 function onPlayerReady(event) {
@@ -242,6 +241,7 @@ function setupSocketEvents() {
 	mGlobals.socket.on('updateUsersList', updateUsersList);
 	mGlobals.socket.on('updateQueue', updateQueue);
 	mGlobals.socket.on('clientChatMessage', receivedChatMessage);
+	mGlobals.socket.on('foundGenreJam', foundGenreJam);
 }
 
 function receivedChatMessage(data) {
@@ -302,8 +302,18 @@ function sessionReady(data) {
 	mGlobals.sessionInitialized = true;
 }
 
-//starts the whole shebang
-function enterJamSession(urlRoomName) {
+function setupSockets() {
+	mGlobals.socket = io();
+	setupSocketEvents();
+}
+
+function foundGenreJam(data) {
+	joinJamSession(data.genreName);
+}
+
+//three entry points: genre, url, text box
+function setupJamSession(params) {
+
 	if(mGlobals.entered_jam) {
 		return;
 	}
@@ -311,10 +321,22 @@ function enterJamSession(urlRoomName) {
 		mGlobals.entered_jam = true;
 	}
 
-	mGlobals.socket = io();
-	setupSocketEvents();
-	
-	var sessionName = urlRoomName || $("#txt_group_join").val();
+	var genre = params.genreName;
+	var url = params.urlName;
+
+	if(genre) {
+		mGlobals.socket.emit('findGenre', {genreName: genreName});
+	}
+	else if(url) {
+		joinJamSession(url);
+	}
+	else {
+		joinJamSession($("#txt_group_join").val());
+	}
+
+}
+
+function joinJamSession(sessionName) {
 	mGlobals.session.name = sessionName;
 
 	//TODO: better login flow
@@ -326,7 +348,7 @@ function enterJamSession(urlRoomName) {
 		sessionName : mGlobals.session.name
 	};
 	mGlobals.socket.emit('userJoinSession', data);
-}
+};
 
 //==================================================================
 // Chat functions
@@ -347,7 +369,7 @@ function youtubeAPIInit() {
 	gapi.client.load("youtube", "v3", function() {
 		mGlobals.youtube_api_ready = true;
 		if(mGlobals.url_room && mGlobals.player_ready) {
-			enterJamSession(mGlobals.url_room);
+			setupJamSession({urlName : mGlobals.url_room});
 		}
 	});
 }
