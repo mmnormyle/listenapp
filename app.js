@@ -80,11 +80,12 @@ app.use(function(err, req, res, next) {
     });
 });
 
-function createSession(sessionName, callback) {
+function createSession(sessionName, callback, genreName) {
     var session = {
         queue : [],
         current_user_ids : [],
-        name : sessionName
+        name : sessionName,
+        genre : genreName
     };
     db.collection('sessions').insert(session, function(err, results) {
         var doc = results.ops[0];
@@ -331,6 +332,7 @@ function clientFindGenre(socket, genreName) {
     var sessions = db.collection('sessions');
     sessions.find({genre : genreName}).toArray(function(e, results) {
         var found = false;
+        console.log('results length' + results.length);
         for(var i=0;(i<results.length && !found);i++) {
             if(results[i].current_user_ids.length<MAX_USERS) {
                 socket.emit('foundGenreJam', {genreName : results[i].name});
@@ -340,9 +342,9 @@ function clientFindGenre(socket, genreName) {
         if(!found) {
             createSession(genreName + results.length, function(session) {
                 socket.emit('foundGenreJam', {genreName : session.name});
-            });
+            }, genreName);
         }
-    }
+    });
 
 }
 
@@ -426,6 +428,7 @@ io.on('connection', function (socket) {
     });
 
     socket.on('findGenre', function(data) {
+        console.log('findGenre');
         clientFindGenre(socket, data.genreName);
     });
 

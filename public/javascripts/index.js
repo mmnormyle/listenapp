@@ -17,7 +17,7 @@ $(document).ready(function(){
 		$(".genre_inner").hide();
 		$("#div_genre").show();
 		$(".genre_inner").fadeIn(1000);
-		$(".genre_inner").click(genreClicked(this));
+		$(".genre_inner").click(genreClicked);
 		$("#txt_name_join").hide();	
 		$("#chat_input").show();
 	}
@@ -89,13 +89,14 @@ var mGlobals = {
 // UI Functions
 //==================================================================
 
-function enterJamSessionUI() {
+function enterJamSessionUI(roomName) {
 	$("#div_genre").hide();
+	$("#p_room_name").text(roomName);
 	$("#div_music").fadeIn(1000);	
 }
 
 function genreClicked(genreButton) {
-	setupJamSession({genreName : $(genreButton).text()});
+	setupJamSession({genreName : "Jazz"});
 }
 
 function onPlayerReady(event) {
@@ -298,7 +299,7 @@ function sessionReady(data) {
 	setInterval(saveUserVideoState, 10000);
 	nextVideoInQueue();
 	updateUsersListUI(mGlobals.current_users);
-	enterJamSessionUI();
+	enterJamSessionUI(mGlobals.session.name);
 	mGlobals.sessionInitialized = true;
 }
 
@@ -308,12 +309,13 @@ function setupSockets() {
 }
 
 function foundGenreJam(data) {
+	console.log('found genre jam' + data.genreName);
 	joinJamSession(data.genreName);
 }
 
 //three entry points: genre, url, text box
 function setupJamSession(params) {
-
+	console.log('setupJamSession');
 	if(mGlobals.entered_jam) {
 		return;
 	}
@@ -321,14 +323,19 @@ function setupJamSession(params) {
 		mGlobals.entered_jam = true;
 	}
 
-	var genre = params.genreName;
-	var url = params.urlName;
+	setupSockets();
 
-	if(genre) {
+	if(params) {
+		var genreName = params.genreName;
+		var urlName = params.urlName;
+	}
+	
+	if(genreName) {
+		console.log(genreName);
 		mGlobals.socket.emit('findGenre', {genreName: genreName});
 	}
-	else if(url) {
-		joinJamSession(url);
+	else if(urlName) {
+		joinJamSession(urlName);
 	}
 	else {
 		joinJamSession($("#txt_group_join").val());
