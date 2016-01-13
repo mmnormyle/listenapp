@@ -249,6 +249,10 @@ function receivedChatMessage(data) {
 	var user = data.user;
 	var innerHTML = $('#messages').html() || "";
 	$('#messages').html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
+	var children = $('#messages').children();
+	if(children.length>10) {
+		children[0].remove();
+	}
 }
 
 function updateUsersList(users) {
