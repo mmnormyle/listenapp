@@ -89,20 +89,20 @@ var mGlobals = {
 // UI Functions
 //==================================================================
 
-function enterJamSessionUI(roomName) {
+function sessionReadyUI(roomName) {
 	$("#div_genre").hide();
 	$("#p_room_name").text(roomName);
 	$("#div_music").fadeIn(1000);	
 }
 
-function genreClicked(genreButton) {
-	setupJamSession({genreName : "Jazz"});
+function genreClicked(event) {
+	setupJamSession({genreName : $(event.target).text()});
 }
 
 function onPlayerReady(event) {
 	mGlobals.player_ready = true;
 	if(mGlobals.url_room && mGlobals.youtube_api_ready) {
-		enterJamSession(mGlobals.url_room);
+		setupJamSession({urlName : mGlobals.url_room});
 	}
 }
 
@@ -299,7 +299,7 @@ function sessionReady(data) {
 	setInterval(saveUserVideoState, 10000);
 	nextVideoInQueue();
 	updateUsersListUI(mGlobals.current_users);
-	enterJamSessionUI(mGlobals.session.name);
+	sessionReadyUI(mGlobals.session.name);
 	mGlobals.sessionInitialized = true;
 }
 
@@ -309,7 +309,7 @@ function setupSockets() {
 }
 
 function foundGenreJam(data) {
-	console.log('found genre jam' + data.genreName);
+	console.log('found genre jam ' + data.genreName);
 	joinJamSession(data.genreName);
 }
 
