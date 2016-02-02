@@ -16,7 +16,7 @@ $(document).ready(function(){
 	if(!roomName) {
 		$(".genre_inner").hide();
 		$("#div_genre").show();
-		$(".genre_inner").fadeIn(1000);
+		$(".genre_inner").fadeIn(700);
 		$(".genre_inner").click(genreClicked);
 		$("#txt_name_join").hide();	
 		$("#chat_input").show();
@@ -35,7 +35,7 @@ $(document).ready(function(){
 	$("#txt_group_join").keypress(function(e) {
 		if(e.which==13) {
 			$("#txt_group_join").hide();
-			$("#txt_name_join").fadeIn(500);	
+			$("#txt_name_join").fadeIn(700);	
 			$("#txt_name_join").focus();
 			$("#txt_name_join").select();
 		}
@@ -91,8 +91,14 @@ var mGlobals = {
 
 function sessionReadyUI(roomName) {
 	$("#div_genre").hide();
-	$("#div_music").fadeIn(1000);	
-}
+	$("#div_music").fadeIn(700);	
+	var pathArray = location.href.split( '/' );
+	var url = pathArray[0] + '//' + pathArray[2];
+	window.history.pushState({}, "Music Room", url+'/rooms/'+mGlobals.session.name);
+	setTimeout(function() {
+		$("#p_invite_friends").fadeOut(700);
+	}, 10000);
+} 
 
 function genreClicked(event) {
 	setupJamSession({genreName : $(event.target).text()});
@@ -151,7 +157,7 @@ function setupVideo() {
 
 function userNameChange() {
 	$("#txt_name_change").hide();
-	$("#chat_input").fadeIn(1000);
+	$("#chat_input").fadeIn(700);
 	saveUserNameChange($("#txt_name_change").val());
 	$("#txt_name_change").hide();	
 }

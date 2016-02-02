@@ -125,6 +125,7 @@ body {
 #div_player {
 	width: 33.333%;
 	margin-top: 7%;
+	text-align: center;
 }
 
 #div_recommender {
@@ -181,6 +182,12 @@ body {
 
 #txt_name_change {
 	width: 100%;
+}
+
+#p_invite_friends {
+	text-align: center;
+	position: absolute;
+    bottom: 0;
 }
 
 
