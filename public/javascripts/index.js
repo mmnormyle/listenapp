@@ -91,7 +91,6 @@ var mGlobals = {
 
 function sessionReadyUI(roomName) {
 	$("#div_genre").hide();
-	$("#p_room_name").text(roomName);
 	$("#div_music").fadeIn(1000);	
 }
 
