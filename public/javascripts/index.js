@@ -22,8 +22,6 @@ $(document).ready(function(){
 		$("#chat_input").show();
 	}
 	else {
-		$("chat_input").hide();
-		$("#txt_name_change").show();
 		mGlobals.url_room = roomName;
 	}
 
@@ -353,7 +351,14 @@ function joinJamSession(sessionName) {
 
 	//TODO: better login flow
 	var name = $("#txt_name_join").val();
-	mGlobals.user = createTempUser(name || 'Anonymous');
+	if(name) {
+		mGlobals.user = createTempUser(name);
+	}
+	else {
+		$("#chat_input").hide();
+		$("#txt_name_change").show();
+		mGlobals.user = createTempUser('Anonymous');
+	}
 
 	var data = {
 		user : mGlobals.user,
