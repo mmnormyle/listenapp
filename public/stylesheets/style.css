@@ -120,6 +120,7 @@ body {
 
 #div_users_list {
 	padding-right: 30px;
+	overflow: hidden;
 }
 
 #div_player {
@@ -133,7 +134,7 @@ body {
 }
 
 #p_recommender {
-	display: inline;
+
 }
 
 #div_youtube_wrapper {
@@ -188,6 +189,10 @@ body {
 	text-align: center;
 	position: absolute;
     bottom: 0;
+}
+
+.p_user {
+	overflow: hidden;
 }
 
 

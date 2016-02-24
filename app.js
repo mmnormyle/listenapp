@@ -454,6 +454,16 @@ io.on('connection', function (socket) {
         io.to(socket.roomName).emit('clientChatMessage', data);
     });
 
+    socket.on('synchronizeUsers', function() {
+        fetchSession({
+            _id : socket.sessionId
+        }, function(session) {
+            fetchUserList(session.current_user_ids, function(users) {
+            socket.emit('updateUsersList', JSON.stringify(users));
+            });
+        });
+    });
+
 });
 
 module.exports = app;

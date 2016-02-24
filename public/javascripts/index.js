@@ -126,8 +126,20 @@ function updateUsersListUI(users) {
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
+		//uses local user data instead of what is currently in the server
+		if(user._id===mGlobals.user._id) {
+			user = mGlobals.user;
+		}
 		var color = user.color;
-		var innerht = '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name+'</span><br><br>';
+		var queue_position = user.queue_position;
+		if(queue_position!=-1) {
+			current_video_title = mGlobals.queue[queue_position].title;
+		}
+		else {
+			current_video_title = "Nothing";
+		}
+		mGlobals.queue[user.queue_position]
+		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
 	}
 }
@@ -149,7 +161,7 @@ function setupVideo() {
 	if(mGlobals.user.queue_position!=-1) {
 		var recommendation = mGlobals.queue[mGlobals.user.queue_position];
 		updateQueueUI(mGlobals.queue, mGlobals.user.queue_position);
-		updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name);		
+		updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name, recommendation.title);		
 	}
 }
 
@@ -259,6 +271,11 @@ function receivedChatMessage(data) {
 	}
 }
 
+function synchronizeUsers() {
+	console.log('synchronize user request');
+	mGlobals.socket.emit('synchronizeUsers');
+}
+
 function updateUsersList(users) {
 	users = JSON.parse(users);
 	console.log('updateUsersList: ');
@@ -365,6 +382,8 @@ function joinJamSession(sessionName) {
 		sessionName : mGlobals.session.name
 	};
 	mGlobals.socket.emit('userJoinSession', data);
+
+	setInterval(synchronizeUsers, 5000);
 };
 
 //==================================================================
@@ -443,12 +462,13 @@ function onPlayerStateChange(event) {
     }
 }
 
-function updatePlayerUI(current_video, current_video_time, current_recommender_name) {
+function updatePlayerUI(current_video, current_video_time, current_recommender_name, current_video_title) {
 	if(!mGlobals.player_ready) {
 		setTimeout(updatePlayerUI(current_video, current_video_time, current_recommender_name), 1000);
 	}
 	mGlobals.player.loadVideoById(current_video, current_video_time, "large");	
 	$("#p_recommender").text("Recommended by " + current_recommender_name);
+	$("#p_video_title").text(current_video_title);
 	var color = 'black';
 	//TODO: shitty
 	for(var i=0;i<mGlobals.current_users.length;i++) {
@@ -458,6 +478,7 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 		} 
 	}
 	$("#p_recommender").css("border-bottom", "1px solid " + color);
+	synchronizeUsers();
 }
 
 //==================================================================
