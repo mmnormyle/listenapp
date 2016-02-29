@@ -133,10 +133,6 @@ body {
 	text-align: center;
 }
 
-#p_recommender {
-
-}
-
 #div_youtube_wrapper {
 	display: flex;
 	justify-content: center;
@@ -178,11 +174,11 @@ body {
 }
 
 #chat_input {
-	width: 100%;
+	width: 95%;
 }
 
 #txt_name_change {
-	width: 100%;
+	width: 95%;
 }
 
 #p_invite_friends {
@@ -195,4 +191,15 @@ body {
 	overflow: hidden;
 }
 
+#p_invite_friends {
+	color: green;
+}
+
+#p_recommender {
+	width: 95%;
+}
+
+#p_video_title {
+	width: 95%;
+}
 

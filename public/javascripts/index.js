@@ -17,6 +17,7 @@ $(document).ready(function(){
 		$(".genre_inner").hide();
 		$("#div_genre").show();
 		$(".genre_inner").fadeIn(700);
+		// $(".genre_inner").show();
 		$(".genre_inner").click(genreClicked);
 		$("#txt_name_join").hide();	
 		$("#chat_input").show();
@@ -186,7 +187,6 @@ function nextVideoInQueue() {
 	}
 	else {
 		$("#p_recommender").text("Queue up a song!");
-		$("#p_recommender").css("border-bottom", "1px solid black");
 		mGlobals.user.waiting = true;
 	}
 }
@@ -477,7 +477,6 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 			color = user.color;
 		} 
 	}
-	$("#p_recommender").css("border-bottom", "1px solid " + color);
 	synchronizeUsers();
 }
 
