@@ -216,6 +216,8 @@ function removeUserFromSession(sessionId, user, callback) {
 
 //TODO: this is probably to good to be true
 function fetchUserList(user_ids, callback) {
+    //TODO: bandaid
+    user_ids = user_ids || [];
     var users = [];
     db.collection('users').find({"_id" : {"$in" : user_ids}}).toArray(function(err, results) {
         var docs = results;
