@@ -176,7 +176,6 @@ function userNameChange() {
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
-
 function nextVideoInQueue() {
 	mGlobals.user.video_time = 0;
 	var queue = mGlobals.queue;
@@ -358,13 +357,13 @@ function setupJamSession(params) {
 		joinJamSession(urlName);
 	}
 	else {
-		joinJamSession($("#txt_group_join").val());
+		joinJamSession(encodeURI($("#txt_group_join").val()));
 	}
 
 }
 
-function joinJamSession(sessionName) {
-	mGlobals.session.name = sessionName;
+function joinJamSession(encodedSessionName) {
+	mGlobals.session.name = decodeURI(encodedSessionName);
 
 	//TODO: better login flow
 	var name = $("#txt_name_join").val();
@@ -379,7 +378,7 @@ function joinJamSession(sessionName) {
 
 	var data = {
 		user : mGlobals.user,
-		sessionName : mGlobals.session.name
+		sessionName : encodedSessionName
 	};
 	mGlobals.socket.emit('userJoinSession', data);
 
