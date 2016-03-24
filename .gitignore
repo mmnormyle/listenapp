@@ -7,6 +7,8 @@ lib-cov
 *.pid
 *.gz
 
+.idea/
+
 npm-debug.log.*
 
 pids
