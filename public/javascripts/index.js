@@ -176,6 +176,20 @@ function userNameChange() {
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
+function previousVideoInQueue() {
+	mGlobals.user.video_time = 0;
+	var queue = mGlobals.queue;
+	if(mGlobals.user.queue_position>0) {
+		var queue_position = mGlobals.user.queue_position = mGlobals.user.queue_position - 1;
+		setupVideo();
+		mGlobals.user.waiting = false;
+	}
+	else {
+		$("#p_recommender").text("Queue up a song!");
+		mGlobals.user.waiting = true;
+	}
+}
+
 function nextVideoInQueue() {
 	mGlobals.user.video_time = 0;
 	var queue = mGlobals.queue;
