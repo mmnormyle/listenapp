@@ -197,6 +197,7 @@ body {
 
 #p_recommender {
 	width: 100%;
+	margin-top: 0;
 }
 
 #p_video_title {
