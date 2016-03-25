@@ -176,6 +176,16 @@ function userNameChange() {
 //==================================================================
 // Backend video and queue control functions
 //==================================================================
+function deleteVideoInQueue(queue_position) {
+	var id = mGlobals.queue[queue_position]._id;
+	mGlobals.queue.splice(queue_position, 1);
+	updateQueueUI();
+	var data =  {
+		recommendatonId : id
+	};
+	mGlobals.socket.emit('deleteRecommendationFromSession', data);
+}
+
 function previousVideoInQueue() {
 	mGlobals.user.video_time = 0;
 	var queue = mGlobals.queue;

@@ -151,6 +151,25 @@ function fetchSession(params, callback) {
     }
 }
 
+function deleteRecommendationFromSession(sessionId, recommendationId, callback) {
+    var sessions = db.collection('sessions');
+    fetchSession({_id : sessionId}, function(session) {
+        var queue = session.queue;
+        for(var i = 0;i<queue.length;i++) {
+            if(queue[i]._id.equals(recommendationId)) {
+                queue.splice(i, 1);
+                break;
+            }
+        }
+        sessions.updateOne({_id : sessionId}, {$set : {'queue':queue}}, function(err) {
+            console.log(err===null ? 'successfully updated queue' : 'error updating queue');
+        });
+        if(callback) {
+            callback();
+        }
+    });
+}
+
 function addRecommendationToSession(sessionId, recommendationId, callback) {
     var sessions = db.collection('sessions');
     fetchSession({_id : sessionId}, function(session) {
@@ -415,6 +434,13 @@ io.on('connection', function (socket) {
             });
         });
     });
+
+    socket.on('deleteRecommendationFromSession', function(data) {
+        var recommendationId = data.recommendationId;
+        deleteRecommendationFromSession(socket.sessionId, recommendationId, function() {
+            clientsUpdateSessionQueue(socket.sessionId);
+        });
+    })
 
     socket.on('saveUserVideoState', function(data) {
         console.log('saveUserVideoState');
