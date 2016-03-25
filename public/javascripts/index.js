@@ -5,7 +5,7 @@ $(document).ready(function(){
 	$("#div_new_session").hide();
 	$("#div_unfinished").hide();
 	$("#txt_name_change").hide();
-	$("#chat_input").hide();
+	// $("#chat_input").hide();
 
 	var pathname = window.location.pathname;
 	var roomName = null;

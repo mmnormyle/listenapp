@@ -43,11 +43,8 @@ block content
 			br
 			#div_messages
 				ul#messages
-			#div_chat_input
-				input(id="chat_input", autocomplete="off", placeholder="type your chat message and hit enter")
-				input(id="txt_name_change", type="text", placeholder="Type a name for yourself and hit enter")
-			p#p_invite_friends
-				| Friends can join this room by following the URL in your browser!
+			input(class="chat_input" id="chat_input", autocomplete="off", placeholder="type your chat message and hit enter")
+			input(class="chat_input" id="txt_name_change", type="text", placeholder="Type a name for yourself and hit enter")
 		#div_right.col
 			| Add to the queue
 			br
