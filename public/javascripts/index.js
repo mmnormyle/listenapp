@@ -110,6 +110,16 @@ function onPlayerReady(event) {
 	}
 }
 
+function queueRollover(item) {
+	$(item).attr('src', '../images/cross.jpg');
+	//TODO: can place statically
+	$(item).attr('onclick', "deleteVideoInQueue(" + item.getAttribute('data-queue_position') + ")");
+}
+
+function queueRolloff(item) {
+	$(item).attr('src', item.getAttribute('data-thumb_URL'));
+}
+
 function updateQueueUI() {
 	var next_queue_position = mGlobals.user.queue_position + 1;
 	var queue = mGlobals.queue;
@@ -117,7 +127,7 @@ function updateQueueUI() {
 	queueList.innerHTML = "";
 	for(var i=next_queue_position;i<queue.length;i++) {
 		var recommendation = queue[i];
-		var innerht = "<li><div><img src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
+		var innerht = "<li><div><img data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
 		queueList.innerHTML += innerht;
 	}
 }
@@ -177,11 +187,12 @@ function userNameChange() {
 // Backend video and queue control functions
 //==================================================================
 function deleteVideoInQueue(queue_position) {
+	console.log(queue_position);
 	var id = mGlobals.queue[queue_position]._id;
 	mGlobals.queue.splice(queue_position, 1);
 	updateQueueUI();
 	var data =  {
-		recommendatonId : id
+		recommendationId : id
 	};
 	mGlobals.socket.emit('deleteRecommendationFromSession', data);
 }

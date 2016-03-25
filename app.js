@@ -23,7 +23,7 @@ MongoClient.connect((process.env.MONGOLAB_URI || mongoURI), function(err, ret_db
 var app = express();
 
 var socket_io = require('socket.io');
-
+    
 var io = socket_io();
 app.io = io;
 
@@ -156,7 +156,9 @@ function deleteRecommendationFromSession(sessionId, recommendationId, callback) 
     fetchSession({_id : sessionId}, function(session) {
         var queue = session.queue;
         for(var i = 0;i<queue.length;i++) {
-            if(queue[i]._id.equals(recommendationId)) {
+            console.log(queue[i]);
+            console.log(recommendationId);
+            if(queue[i].equals(recommendationId)) {
                 queue.splice(i, 1);
                 break;
             }
