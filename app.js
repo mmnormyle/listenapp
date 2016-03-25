@@ -442,7 +442,7 @@ io.on('connection', function (socket) {
                     clientsUpdateSessionUsers(socket.sessionId);   
                 }
                 else {
-                    cleanupSession(socket.sessionId);
+                    // cleanupSession(socket.sessionId);
                 }
             });
         }   

@@ -32,15 +32,15 @@ block content
 			#div_users_list
 		#div_player.col
 			#div_recommender
-				span#p_recommender
+				p#p_recommender
 				p#p_video_title
 			br
 			#div_youtube_wrapper
 				#youtubeplayer
 			br
-			img(src="../images/arrows-1.png" onclick="previousVideoInQueue()")
+			img(class="img_control" src="../images/arrows-1.png" onclick="previousVideoInQueue()")
 			div(style="width: 15px; display: inline-block;")
-			img(src="../images/arrows.png" onclick="nextVideoInQueue()")
+			img(class="img_control" src="../images/arrows.png" onclick="nextVideoInQueue()")
 			br
 			#div_messages
 				ul#messages

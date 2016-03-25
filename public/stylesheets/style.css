@@ -196,10 +196,14 @@ body {
 }
 
 #p_recommender {
-	width: 95%;
+	width: 100%;
 }
 
 #p_video_title {
-	width: 95%;
+	width: 100%;
+}
+
+.img_control {
+	cursor:pointer;
 }
 

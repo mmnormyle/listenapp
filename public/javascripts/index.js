@@ -184,10 +184,6 @@ function previousVideoInQueue() {
 		setupVideo();
 		mGlobals.user.waiting = false;
 	}
-	else {
-		$("#p_recommender").text("Queue up a song!");
-		mGlobals.user.waiting = true;
-	}
 }
 
 function nextVideoInQueue() {
@@ -199,6 +195,7 @@ function nextVideoInQueue() {
 		mGlobals.user.waiting = false;
 	}
 	else {
+		$("#p_video_title").text("Use the search bar on the right.");
 		$("#p_recommender").text("Queue up a song!");
 		mGlobals.user.waiting = true;
 	}
