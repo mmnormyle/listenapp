@@ -66,7 +66,7 @@ $(document).ready(function(){
 
 	setTimeout(function() {
 		$("#p_link").animate({opacity: 0});
-	}, 5000);
+	}, 10000);
 
 	$("#chat_input").keypress(function(e) {
 		if(e.which==13) {
