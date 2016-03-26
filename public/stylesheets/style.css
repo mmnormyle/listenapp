@@ -191,7 +191,7 @@ body {
 	left: 7px;
 	right: 0;
     bottom: 16px;
-    width: 400px;
+    width: 300px;
 }
 
 #p_recommender {
@@ -205,5 +205,20 @@ body {
 
 .img_control {
 	cursor:pointer;
+}
+
+#txt_email {
+	position: absolute;
+	left: 72%;
+	right: 0;
+    bottom: 16px;
+    width: 300px;
+}
+
+#btn_email {
+	position: absolute;
+	left: 80%;
+	right: 0;
+    bottom: 16px;
 }
 
