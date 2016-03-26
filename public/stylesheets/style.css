@@ -115,7 +115,6 @@ body {
 
 #div_left {
 	width: 33.333%;
-	margin-top: 7%;
 }
 
 #div_users_list {
@@ -125,7 +124,6 @@ body {
 
 #div_player {
 	width: 33.333%;
-	margin-top: 7%;
 	text-align: center;
 }
 
@@ -153,9 +151,15 @@ body {
 	overflow-y: scroll;
 }
 
+#div_top {
+	display: inline-block;
+	width: 100%;
+	height: 90px;
+	text-align: center;
+}
+
 #div_right {
 	width: 33.333%;
-	margin-top: 7%;
 	text-align: right;
 }
 
@@ -203,7 +207,7 @@ body {
 }
 
 .img_control {
-	cursor:pointer;
+	cursor: pointer;
 }
 
 #txt_email {
@@ -231,5 +235,9 @@ html, body {
 }
 .footer, .push {
 	height: 32px; /* .push must be the same height as .footer */
+}
+
+#p_link {
+	color: blue;
 }
 
