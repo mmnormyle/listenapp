@@ -9,7 +9,7 @@ $(document).ready(function(){
 	if(!window.mobilecheck) {
 		$("#div_mobile").show();
 		$("#div_genre").hide();
-		$("#div_music").hide();
+		$(".div_in_room").hide();
 		$("#div_new_session").hide();
 		$("#div_unfinished").hide();
 		return;
@@ -17,7 +17,7 @@ $(document).ready(function(){
 
 	$("#div_mobile").hide();
 	$("#div_genre").hide();
-	$("#div_music").hide();
+	$(".div_in_room").hide();
 	$("#div_new_session").hide();
 	$("#div_unfinished").hide();
 	$("#txt_name_change").hide();
@@ -112,7 +112,7 @@ var mGlobals = {
 
 function sessionReadyUI(roomName) {
 	$("#div_genre").hide();
-	$("#div_music").fadeIn(700);	
+	$(".div_in_room").fadeIn(700);	
 	var pathArray = location.href.split( '/' );
 	var url = pathArray[0] + '//' + pathArray[2];
 	window.history.pushState({}, "Music Room", url+'/rooms/'+mGlobals.session.name);
