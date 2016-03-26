@@ -4,6 +4,7 @@ var favicon = require('serve-favicon');
 var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
+var nodemailer = require('nodemailer');
 
 var mongoURI = 'mongodb://localhost:27017/test';
 var ObjectID = require('mongodb').ObjectID;
@@ -491,6 +492,32 @@ io.on('connection', function (socket) {
             fetchUserList(session.current_user_ids, function(users) {
             socket.emit('updateUsersList', JSON.stringify(users));
             });
+        });
+    });
+
+    socket.on('emailQueue', function(data) {
+        console.log("data: " + data);
+        console.log(data);
+        var queue = data.queue;
+        var email = data.email;
+        console.log("queue: " + queue);
+        console.log("email: " + email);
+        var list = '';
+        for(var i=0;i<queue.length;i++) {
+            list += queue[i].title + "\n";
+        }
+        var transporter = nodemailer.createTransport('smtps://listentomusicwithme%40gmail.com:socialmusic@smtp.gmail.com');
+        var mailOptions = {
+            from: '"Listen With Me" <listenwithme@gmail.com>', // sender address
+            to: email, // list of receivers
+            subject: 'Your music!', // Subject line
+            text: list
+        };
+        transporter.sendMail(mailOptions, function(error, info){
+            if(error){
+                return console.log(error);
+            }
+            console.log('Message sent: ' + info.response);
         });
     });
 

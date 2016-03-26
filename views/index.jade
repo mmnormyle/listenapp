@@ -57,6 +57,9 @@ block content
 			#div_queue
 				| Up next...
 				ul#list_queue
+				button(onmouseover="saveQueueRollover(this)" onmouseout="saveQueueRolloff(this)")
+					| Save These Songs
+				input(id="txt_email", style="width: 270px" placeholder="Enter your email and we'll send the queue to you.")
 
 	div(id="div_unfinished", style="width:100%; height:100%") 
 		.container.error_div

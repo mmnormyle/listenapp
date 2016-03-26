@@ -5,6 +5,7 @@ $(document).ready(function(){
 	$("#div_new_session").hide();
 	$("#div_unfinished").hide();
 	$("#txt_name_change").hide();
+	$("#txt_email").hide();
 	// $("#chat_input").hide();
 
 	var pathname = window.location.pathname;
@@ -56,6 +57,11 @@ $(document).ready(function(){
 	$("#txt_name_change").keypress(function(e) {
 		if(e.which==13) {
 			userNameChange();
+		}
+	});
+	$("#txt_email").keypress(function(e) {
+		if(e.which==13) {
+			emailQueue();
 		}
 	});
 
@@ -130,6 +136,21 @@ function updateQueueUI() {
 		var innerht = "<li><div><img data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
 		queueList.innerHTML += innerht;
 	}
+}
+
+function saveQueueRollover(btn) {
+	$("#txt_email").show();
+	$(btn).hide();
+}
+
+function saveQueueRolloff(btn) {
+	// $("#txt_email").hide();
+	// $(btn).show();
+}
+
+function emailQueue() {
+	mGlobals.socket.emit('emailQueue', {email : $("#txt_email").val(), queue : mGlobals.queue});
+	$("#txt_email").fadeOut();
 }
 
 function updateUsersListUI(users) {
