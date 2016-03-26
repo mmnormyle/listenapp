@@ -358,10 +358,10 @@ function clientFindGenre(socket, genreName) {
         var found = false;
         console.log('results length' + results.length);
         for(var i=0;(i<results.length && !found);i++) {
-            if(results[i].current_user_ids.length<MAX_USERS) {
-                socket.emit('foundGenreJam', {genreName : results[i].name});
-                found = true;
-            }
+            // if(results[i].current_user_ids.length<MAX_USERS) {
+            socket.emit('foundGenreJam', {genreName : results[i].name});
+            found = true;
+            // }
         }   
         if(!found) {
             createSession(genreName + results.length, function(session) {
