@@ -33,6 +33,7 @@
 }
 
 .genre_inner {
+	cursor: pointer;
 	height: 50%;
 	width: 80%;
 	margin: auto;
@@ -241,3 +242,6 @@ html, body {
 	color: blue;
 }
 
+.li_search_result {
+	cursor: pointer;
+}
