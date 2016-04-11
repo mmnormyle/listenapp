@@ -2,39 +2,16 @@ doctype html
 html
   head
     title= 'Moosic'
-    link(rel='stylesheet', href='/stylesheets/style.css')
+    link(rel='stylesheet', href='/stylesheets/musicroom.css')
     link(href='https://fonts.googleapis.com/css?family=Josefin+Sans&subset=latin,latin-ext' rel='stylesheet' type='text/css')
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
     script(src="https://cdn.socket.io/socket.io-1.0.0.js?onload=socketioLoad")
-    script(src="/javascripts/index.js")
+    script(src="/javascripts/musicroom.js")
     script(src="https://apis.google.com/js/client.js?onload=youtubeAPIInit")
     script(src="https://www.youtube.com/iframe_api")
     
   body
     div(class="wrapper")
-        div(id="div_genre", style="width:100%, height: 100%")
-            .container
-                .genre_outer
-                    div(class="genre_inner", style="background: red") Jazz
-                .genre_outer
-                    div(class="genre_inner", style="background: orange") Rock
-                .genre_outer
-                    div(class="genre_inner", style="background: teal") Indie
-                .genre_outer
-                    div(class="genre_inner", style="background: green") Soul
-                .genre_outer
-                    div(class="genre_inner", style="background: blue") Funk
-                .genre_outer
-                    div(class="genre_inner", style="background: indigo") Rap
-                .genre_outer
-                    div(class="genre_inner", style="background: violet") Pop
-                .genre_outer
-                    div(class="genre_inner", style="background: grey") Electronic
-                .genre_outer
-                    div(class="genre_inner", style="background: black") Metal
-                div.search
-                    input(id="txt_group_join", type="text", placeholder="What's your room name?" class="edittext")
-                    input(id="txt_name_join", type="text", placeholder="What's your name?" class="edittext")
         div(id="div_music" class="div_in_room" style="width:100%; height:100%")
             #div_top
                 p#p_link
@@ -68,12 +45,6 @@ html
                 #div_queue
                     | Up next (rollover to delete)...
                     ul#list_queue
-        div(id="div_mobile", style="width:100%; height:100%") 
-            .container.error_div
-                | Thanks for visiting, but this website isn't for mobile devices.
-        div(id="div_unfinished", style="width:100%; height:100%") 
-            .container.error_div
-                | Stupid idiot. This feature hasn't been implemented.
         div(class="push")
     div(class="footer")
         #div_footer_content(class="div_in_room")

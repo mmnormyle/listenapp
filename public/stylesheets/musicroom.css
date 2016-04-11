@@ -1,0 +1,247 @@
+* {
+	box-sizing: border-box;
+}
+
+#div_music {
+	height: 70%;
+}
+
+#div_genre {
+	height: 50%;
+}
+
+.container {
+	
+	width: 50%;
+    height: 50%;
+
+    position: absolute;
+    top:0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+
+    margin: auto;
+}
+
+.genre_outer {
+	width: 33%;
+	height: 33%;
+	display: inline-block;
+	float: left;
+	text-align: center;
+}
+
+.genre_inner {
+	cursor: pointer;
+	height: 50%;
+	width: 80%;
+	margin: auto;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	color: white;
+}
+
+.col {
+	height: 100%;
+	float: left;
+}
+
+.error_div {
+	text-align: center;
+}
+
+#downvote {
+	width: 16.5%;
+}
+
+#player {
+	width: 66%;
+}
+
+#upvote {
+	width: 16.5%;
+}
+
+.edittext {
+	border: 0;
+	outline: 0;
+	background: transparent;
+	border-bottom: 2px solid black;
+	margin: auto;
+	width: 92%;
+	text-align: center;
+}
+
+input {
+    border: 0;
+    outline: 0;
+    background: transparent;
+    border-bottom: 1px solid black;
+    width: 20px;
+    text-align: center;
+}
+
+.search {
+	text-align: center;
+}
+
+ul {
+	list-style-type: none;
+	padding: 0;
+}
+
+body {
+        font-family: 'Josefin Sans', serif;
+}
+
+.div_user_outer {
+	display:flex;
+	align-items:center;
+}
+
+.div_user_inner {
+	margin-left: 20%; 
+	display: inline-block; 
+	width: 27px; 
+	height: 27px;
+}
+
+.span_user {
+	margin-top: 2px;
+	margin-left: 8px;
+	display: block;
+}
+
+#div_left {
+	width: 33.333%;
+}
+
+#div_users_list {
+	padding-right: 30px;
+	overflow: hidden;
+}
+
+#div_player {
+	width: 33.333%;
+	text-align: center;
+}
+
+#div_recommender {
+	text-align: center;
+}
+
+#div_youtube_wrapper {
+	display: flex;
+	justify-content: center;
+}
+
+#youtubeplayer {
+
+}
+
+#div_queue {
+	width: 100%;
+	text-align: center;
+	max-height: 500px;
+	overflow-y: hidden;
+}
+
+#div_queue:hover {
+	overflow-y: scroll;
+}
+
+#div_top {
+	display: inline-block;
+	width: 100%;
+	height: 90px;
+	text-align: center;
+}
+
+#div_right {
+	width: 33.333%;
+	text-align: right;
+}
+
+#div_queue_wrapper {
+	padding-left: 30px;
+	padding-right: 8px;
+}
+
+#txt_search_videos {
+	display: block;
+	width: 100%;
+	text-align: right;
+}
+
+#div_messages {
+	width: 100%;
+}
+
+#div_chat_input {
+	width: 100%;
+}
+
+#p_invite_friends {
+	text-align: center;
+	position: absolute;
+    bottom: 0;
+}
+
+.p_user {
+	overflow: hidden;
+}
+
+.chat_input {
+	text-align: center;
+    width: 300px;
+}
+
+#p_recommender {
+	width: 100%;
+	margin-top: 0;
+}
+
+#p_video_title {
+	width: 100%;
+}
+
+.img_control {
+	cursor: pointer;
+}
+
+#txt_email {
+    width: 300px;
+}
+
+#btn_email {
+
+}
+
+.footer_col {
+	display: inline-block;
+	width: 33.33%;
+	text-align: center;
+}
+
+html, body {
+	height: 100%;
+	overflow:hidden;
+}
+
+.wrapper {
+	min-height: 100%;
+	margin: 0 auto -32px; /* the bottom margin is the negative value of the footer's height */
+}
+.footer, .push {
+	height: 32px; /* .push must be the same height as .footer */
+}
+
+#p_link {
+	color: blue;
+}
+
+.li_search_result {
+	cursor: pointer;
+}

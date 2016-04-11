@@ -5,11 +5,11 @@ module.exports = function(io) {
 
 	/* GET home page. */
 	router.get('/', function(req, res, next) {
-	  res.render('index', { title: 'Express' });
+	  res.render('index', { title: 'Moosic' });
 	});
 
 	router.get(/rooms\/*/, function(req, res, next) {
-	  res.render('index', { title: 'Room' });
+	  res.render('musicroom', { title: 'Moosic' });
 	});
 
 	router.post('/userlist', function(req, res, next) {
