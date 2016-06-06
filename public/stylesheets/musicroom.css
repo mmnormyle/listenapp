@@ -145,11 +145,10 @@ body {
 	width: 100%;
 	text-align: center;
 	max-height: 500px;
-	overflow-y: hidden;
 }
 
 #div_queue:hover {
-	overflow-y: scroll;
+
 }
 
 #div_top {
