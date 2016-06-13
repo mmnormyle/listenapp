@@ -11,16 +11,22 @@ html
     script(src="https://www.youtube.com/iframe_api")
     
   body
-    div(class="wrapper")
-        div(id="div_music" class="div_in_room" style="width:100%; height:100%")
-            #div_top
+    div#div_player
+        div#youtubeplayer
+    div#div_search
+        input(id="txt_search_videos", type="text", placeholder="Type an artist and song name and hit enter")
+        ul#list_search_results
+    div#div_info
+    div#div_queue
+        ul#list_queue
+            //#div_top
                 p#p_link
                     | Friends can join this room by following the link above.
-            #div_left.col
+            //#div_left.col
                 | In the room (click on a name to synchronize)
                 br
                 #div_users_list
-            #div_player.col
+            //#div_player.col
                 #div_recommender
                     p#p_recommender
                     p#p_video_title
@@ -34,19 +40,8 @@ html
                 br
                 #div_messages
                     ul#messages
-            #div_right.col
-                | Add to the queue
-                br
-                br
-                #div_queue_wrapper
-                    input(id="txt_search_videos", type="text", placeholder="Type an artist and song name and hit enter")
-                br
-                ul#list_search_results
-                #div_queue
-                    | Up next (rollover to delete)...
-                    ul#list_queue
-        div(class="push")
-    div(class="footer")
+        //div(class="push")
+    //div(class="footer")
         #div_footer_content(class="div_in_room")
             div(class="footer_col")
                 input(id="txt_email", placeholder="Enter your email and we'll this list of songs to you")

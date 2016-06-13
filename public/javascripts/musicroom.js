@@ -109,7 +109,7 @@ function updateQueueUI() {
 	queueList.innerHTML = "";
 	for(var i=next_queue_position;i<queue.length;i++) {
 		var recommendation = queue[i];
-		var innerht = "<li><div><img data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "' height='45' width='80'></img><br><br><span style='display: block; text-align: center;'>" + recommendation.title + "</span></div></li><br>";
+		var innerht = "<img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img>";
 		queueList.innerHTML += innerht;
 	}
 }
@@ -120,7 +120,7 @@ function emailQueue() {
 }
 
 function updateUsersListUI(users) {
-	var usersList = document.getElementById('div_users_list');
+	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
@@ -139,7 +139,7 @@ function updateUsersListUI(users) {
 		mGlobals.queue[user.queue_position]
 		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
-	}
+	}*/
 }
 
 function syncWithUserUI(name) {
@@ -153,6 +153,8 @@ function syncWithUserUI(name) {
 function clearSearchResults() {
 	var searchList = document.getElementById('list_search_results');
 	searchList.innerHTML = "";
+	$(searchList).hide();
+	$("#txt_search_videos").fadeIn();
 }
 
 function setupVideo() {
@@ -438,6 +440,9 @@ function searchVideos() {
 		$.each(results.items, function(index, item) {
 			searchList.innerHTML += ("<li class='li_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li>');
 		});
+		$("#txt_search_videos").hide();
+		$(searchList).fadeIn();
+		$("#txt_search_videos").val("");	
 	});
 }
 

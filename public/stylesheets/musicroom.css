@@ -10,20 +10,6 @@
 	height: 50%;
 }
 
-.container {
-	
-	width: 50%;
-    height: 50%;
-
-    position: absolute;
-    top:0;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-}
-
 .genre_outer {
 	width: 33%;
 	height: 33%;
@@ -69,7 +55,7 @@
 	outline: 0;
 	background: transparent;
 	border-bottom: 2px solid black;
-	margin: auto;
+	margin: 0;
 	width: 92%;
 	text-align: center;
 }
@@ -83,13 +69,18 @@ input {
     text-align: center;
 }
 
-.search {
-	text-align: center;
+#txt_search_videos {
+	width: 70%;
+	vertical-align: middle;
 }
 
 ul {
 	list-style-type: none;
 	padding: 0;
+}
+
+#list_search_results {
+	display: none;
 }
 
 body {
@@ -114,6 +105,11 @@ body {
 	display: block;
 }
 
+* {
+	margin: 0;
+	padding: 0;
+}
+
 #div_left {
 	width: 33.333%;
 }
@@ -124,85 +120,35 @@ body {
 }
 
 #div_player {
-	width: 33.333%;
-	text-align: center;
+	display: inline-block;
+	height: 50%;
+	width: 50%;
+	float: left;
 }
-
-#div_recommender {
-	text-align: center;
-}
-
-#div_youtube_wrapper {
+#div_search {
+	height: 50%;
+	width: 50%;
 	display: flex;
-	justify-content: center;
+	justify-content: center; /* align horizontal */
+	align-items: center; /* align vertical */
+	float: left;
+}
+#div_queue {
+	display: inline-block;
+	height: 50%;
+	width: 50%;
+	float: left;
+}
+
+#div_info {
+	display: inline-block;
+	height: 50%;
+	width: 50%;
+	float: left;
 }
 
 #youtubeplayer {
-
-}
-
-#div_queue {
-	width: 100%;
-	text-align: center;
-	max-height: 500px;
-}
-
-#div_queue:hover {
-
-}
-
-#div_top {
-	display: inline-block;
-	width: 100%;
-	height: 90px;
-	text-align: center;
-}
-
-#div_right {
-	width: 33.333%;
-	text-align: right;
-}
-
-#div_queue_wrapper {
-	padding-left: 30px;
-	padding-right: 8px;
-}
-
-#txt_search_videos {
-	display: block;
-	width: 100%;
-	text-align: right;
-}
-
-#div_messages {
-	width: 100%;
-}
-
-#div_chat_input {
-	width: 100%;
-}
-
-#p_invite_friends {
-	text-align: center;
-	position: absolute;
-    bottom: 0;
-}
-
-.p_user {
-	overflow: hidden;
-}
-
-.chat_input {
-	text-align: center;
-    width: 300px;
-}
-
-#p_recommender {
-	width: 100%;
-	margin-top: 0;
-}
-
-#p_video_title {
+	height: 100%;
 	width: 100%;
 }
 
@@ -210,36 +156,22 @@ body {
 	cursor: pointer;
 }
 
-#txt_email {
-    width: 300px;
-}
-
-#btn_email {
-
-}
-
-.footer_col {
-	display: inline-block;
-	width: 33.33%;
-	text-align: center;
-}
-
 html, body {
 	height: 100%;
 }
 
-.wrapper {
-	min-height: 100%;
-	margin: 0 auto -32px; /* the bottom margin is the negative value of the footer's height */
-}
-.footer, .push {
-	height: 32px; /* .push must be the same height as .footer */
+.img_queue_item {
+	height: 33.33%;
+	width: 33.33%;
+	display: inline-block;
+	float: left;
 }
 
-#p_link {
-	color: blue;
+#list_queue {
+	height: 100%;
 }
 
 .li_search_result {
-	cursor: pointer;
+	display: block;
+	text-align: center;
 }
