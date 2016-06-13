@@ -141,15 +141,28 @@ body {
 }
 
 #div_info {
-	display: inline-block;
+	display: flex;
 	height: 50%;
 	width: 50%;
+	float: left;
+	justify-content: center; /* align horizontal */
+	align-items: center; /* align vertical */
 	float: left;
 }
 
 #youtubeplayer {
 	height: 100%;
 	width: 100%;
+}
+
+#p_recommender {
+	display: block;
+	text-align: center;
+}
+
+#p_video_title {
+	display: block;
+	text-align: center;
 }
 
 .img_control {

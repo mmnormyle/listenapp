@@ -414,7 +414,7 @@ function onYouTubeIframeAPIReady() {
         height: '270',
         width: '400',
         playerVars: {
-        	controls: 1,
+        	controls: 0,
         	showinfo: 0,
         	autoplay: 1
         },
@@ -438,7 +438,7 @@ function searchVideos() {
 		var results = response.result;
 		clearSearchResults();
 		$.each(results.items, function(index, item) {
-			searchList.innerHTML += ("<li class='li_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li>');
+			searchList.innerHTML += ("<li class='li_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li><br>');
 		});
 		$("#txt_search_videos").hide();
 		$(searchList).fadeIn();
