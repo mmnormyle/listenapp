@@ -205,7 +205,7 @@ function nextVideoInQueue() {
 		mGlobals.user.waiting = false;
 	}
 	else {
-		$("#p_video_title").text("Use the search bar on the right.");
+		$("#p_video_title").text("Use the search bar below.")
 		$("#p_recommender").text("Queue up a song!");
 		mGlobals.user.waiting = true;
 	}
@@ -411,8 +411,8 @@ function youtubeAPIInit() {
 
 function onYouTubeIframeAPIReady() {
 	mGlobals.player = new YT.Player('youtubeplayer', {
-        height: '270',
-        width: '400',
+        height: 'auto',
+        width: '100%',
         playerVars: {
         	controls: 0,
         	showinfo: 0,

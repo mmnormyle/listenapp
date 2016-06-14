@@ -71,7 +71,6 @@ input {
 
 #txt_search_videos {
 	width: 70%;
-	vertical-align: middle;
 }
 
 ul {
@@ -84,7 +83,11 @@ ul {
 }
 
 body {
-        font-family: 'Cousine';
+        font-family: 'Source Code Pro';
+}
+
+#div_recommender {
+	display: block;
 }
 
 .div_user_outer {
@@ -141,13 +144,10 @@ body {
 }
 
 #div_info {
-	display: flex;
 	height: 50%;
 	width: 50%;
 	float: left;
-	justify-content: center; /* align horizontal */
-	align-items: center; /* align vertical */
-	float: left;
+	text-align: center;
 }
 
 #youtubeplayer {
@@ -156,6 +156,7 @@ body {
 }
 
 #p_recommender {
+	margin-top: 10%;
 	display: block;
 	text-align: center;
 }

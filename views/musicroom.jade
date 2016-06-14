@@ -8,6 +8,7 @@ html
     script(src="https://cdn.socket.io/socket.io-1.0.0.js?onload=socketioLoad")
     script(src="/javascripts/musicroom.js")
     link(href='https://fonts.googleapis.com/css?family=Cousine' rel='stylesheet' type='text/css')
+    link(href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300' rel='stylesheet' type='text/css')
     script(src="https://apis.google.com/js/client.js?onload=youtubeAPIInit")
     script(src="https://www.youtube.com/iframe_api")
     
@@ -15,12 +16,15 @@ html
     div#div_player
         div#youtubeplayer
     div#div_search
-        input(id="txt_search_videos", type="text", placeholder="Type an artist and song name and hit enter")
-        ul#list_search_results
     div#div_info
         #div_recommender
             p#p_recommender
             br
             p#p_video_title
+            br
+            br
+            br
+        input(id="txt_search_videos", type="text", placeholder="Type an artist and song name and hit enter")
+        ul#list_search_results
     div#div_queue
         ul#list_queue
