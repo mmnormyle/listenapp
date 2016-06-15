@@ -65,12 +65,10 @@ input {
     outline: 0;
     background: transparent;
     border-bottom: 1px solid black;
-    width: 20px;
+    width: 70%;
     text-align: center;
-}
-
-#txt_search_videos {
-	width: 70%;
+    font-size: 14px;
+    font-family: 'Josefin Sans';
 }
 
 ul {
@@ -83,10 +81,11 @@ ul {
 }
 
 body {
-        font-family: 'Source Code Pro';
+    font-family: 'Source Code Pro';
 }
 
 #div_recommender {
+	margin: 0;
 	display: block;
 }
 
@@ -156,7 +155,6 @@ body {
 }
 
 #p_recommender {
-	margin-top: 10%;
 	display: block;
 	text-align: center;
 }

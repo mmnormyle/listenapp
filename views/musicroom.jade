@@ -16,15 +16,22 @@ html
     div#div_player
         div#youtubeplayer
     div#div_search
+        input#chat_input.chat_input(placeholder="leave a comment and press enter")
+        input#txt_name_change.chat_input(placeholder="enter your name and press enter")
     div#div_info
-        #div_recommender
-            p#p_recommender
-            br
-            p#p_video_title
-            br
-            br
-            br
-        input(id="txt_search_videos", type="text", placeholder="Type an artist and song name and hit enter")
-        ul#list_search_results
+        div(style="display: inline-block; width: 100%; height: 33.3333%;")
+            img(src="../images/arrows-1.png")
+            div(style="display: inline-block; width: 20px")
+            img(src="../images/arrows.png")
+        div(style="display: inline-block; width: 100%; height: 33.3333%;")
+            #div_recommender
+                p#p_recommender
+                br
+                p#p_video_title
+                br
+                br
+        div(style="display: inline-block; width: 100%; height: 33.3333%;")
+            input(id="txt_search_videos", type="text", placeholder="type an artist and song name and hit enter")
+            ul#list_search_results
     div#div_queue
         ul#list_queue
