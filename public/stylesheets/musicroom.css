@@ -1,191 +1,63 @@
-* {
-	box-sizing: border-box;
-}
-
-#div_music {
-	height: 70%;
-}
-
-#div_genre {
-	height: 50%;
-}
-
-.genre_outer {
-	width: 33%;
-	height: 33%;
-	display: inline-block;
-	float: left;
-	text-align: center;
-}
-
-.genre_inner {
-	cursor: pointer;
-	height: 50%;
-	width: 80%;
-	margin: auto;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-	color: white;
-}
-
-.col {
+html, body {
 	height: 100%;
-	float: left;
-}
-
-#txt_name_change {
-	display: block;
-	margin: 0 auto;
-}
-
-.error_div {
-	text-align: center;
-}
-
-#downvote {
-	width: 16.5%;
-}
-
-#player {
-	width: 66%;
-}
-
-#upvote {
-	width: 16.5%;
-}
-
-.edittext {
-	border: 0;
-	outline: 0;
-	background: transparent;
-	border-bottom: 2px solid black;
+	width: 100%;
 	margin: 0;
-	width: 92%;
-	text-align: center;
+	background: #f1f1f1;
 }
 
-input {
-    border: 0;
-    outline: 0;
-    background: transparent;
-    border-bottom: 1px solid black;
-    width: 70%;
-    text-align: center;
-    font-size: 14px;
-    font-family: 'Josefin Sans';
+#div_header {
+	height: 9%;
+	background: white;
 }
 
-ul {
-	list-style-type: none;
-	padding: 0;
+#div_body {
+	height: 66%;
 }
 
-#list_search_results {
-	display: none;
-}
-
-body {
-    font-family: 'Source Code Pro';
-}
-
-#div_recommender {
-	margin: 0;
-	display: block;
-}
-
-.div_user_outer {
-	display:flex;
-	align-items:center;
-}
-
-.div_user_inner {
-	margin-left: 20%; 
-	display: inline-block; 
-	width: 27px; 
-	height: 27px;
-}
-
-.span_user {
-	margin-top: 2px;
-	margin-left: 8px;
-	display: block;
-}
-
-* {
-	margin: 0;
-	padding: 0;
-}
-
-#div_left {
-	width: 33.333%;
-}
-
-#div_users_list {
-	padding-right: 30px;
-	overflow: hidden;
+#div_footer {
+	height: 25%;
 }
 
 #div_player {
 	display: inline-block;
-	height: 50%;
-	width: 50%;
-	float: left;
-}
-#div_search {
-	height: 50%;
-	width: 50%;
-	float: left;
-}
-#div_queue {
-	display: inline-block;
-	height: 50%;
-	width: 50%;
-	float: left;
+	width: 61.25%;
+	height: 100%;
+	background: white;
+	margin-top: .5%;
+	margin-left: .75%;
+	margin-right: .75%;
 }
 
 #div_info {
-	height: 50%;
-	width: 50%;
-	float: left;
-	text-align: center;
-}
-
-#youtubeplayer {
-	height: 100%;
-	width: 100%;
-}
-
-#p_recommender {
-	display: block;
-	text-align: center;
-}
-
-#p_video_title {
-	display: block;
-	text-align: center;
-}
-
-.img_control {
-	cursor: pointer;
-}
-
-html, body {
-	height: 100%;
-}
-
-.img_queue_item {
-	height: 33.33%;
-	width: 33.33%;
 	display: inline-block;
-	float: left;
+	width: 36.50%;
+	height: 100%;
+	margin-top: .5%;
+	margin-left: 0;
+	margin-right: .75%;
+	background: white;
 }
 
-#list_queue {
+#div_content_1 {
+	margin-left: .75%;
+}
+
+#div_content_5 {
+	margin-right: 0;
+}
+
+.div_content {
+	background: white;
+	display: inline-block;
+	height: 90%;
+	margin-top: 1%;
+	margin-bottom: 75%;
+	width: 13.5%;
+	margin-right: 5%;
+}
+	
+.img_queue_item {
+	width: 100%;
 	height: 100%;
 }
 
-.li_search_result {
-	display: block;
-	text-align: center;
-}

@@ -45,6 +45,8 @@ $(document).ready(function(){
 		}
 	});
 
+	mGlobals.content_divs = [document.getElementById("div_content_1"), document.getElementById("div_content_2"),  document.getElementById("div_content_3"), document.getElementById("div_content_4"), document.getElementById("div_content_5")];
+
 });
 
 
@@ -102,15 +104,16 @@ function queueRolloff(item) {
 	$(item).attr('src', item.getAttribute('data-thumb_URL'));
 }
 
-function updateQueueUI() {
-	var next_queue_position = mGlobals.user.queue_position + 1;
+function updateQueueUI(starting_queue_position) {
 	var queue = mGlobals.queue;
-	var queueList = document.getElementById('list_queue');
-	queueList.innerHTML = "";
-	for(var i=next_queue_position;i<queue.length;i++) {
+	var i = starting_queue_position;
+	var j = 0;
+	while(i<starting_queue_position+5 && i<queue.length) {
 		var recommendation = queue[i];
 		var innerht = "<img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img>";
-		queueList.innerHTML += innerht;
+		$(mGlobals.content_divs[i]).innerHTML = innerht; 
+		i++;
+		j++;
 	}
 }
 
@@ -120,7 +123,7 @@ function emailQueue() {
 }
 
 function updateUsersListUI(users) {
-	var usersList = document.getElementById('div_users_list');
+	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
@@ -139,7 +142,7 @@ function updateUsersListUI(users) {
 		mGlobals.queue[user.queue_position]
 		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
-	}
+	}*/
 }
 
 function syncWithUserUI(name) {
@@ -410,7 +413,7 @@ function youtubeAPIInit() {
 }
 
 function onYouTubeIframeAPIReady() {
-	mGlobals.player = new YT.Player('youtubeplayer', {
+	mGlobals.player = new YT.Player('div_player', {
         height: 'auto',
         width: '100%',
         playerVars: {
