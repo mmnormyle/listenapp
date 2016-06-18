@@ -130,9 +130,6 @@ body {
 #div_search {
 	height: 50%;
 	width: 50%;
-	display: flex;
-	justify-content: center; /* align horizontal */
-	align-items: center; /* align vertical */
 	float: left;
 }
 #div_queue {

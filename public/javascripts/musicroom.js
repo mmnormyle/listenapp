@@ -120,7 +120,7 @@ function emailQueue() {
 }
 
 function updateUsersListUI(users) {
-	/*var usersList = document.getElementById('div_users_list');
+	var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
@@ -137,9 +137,9 @@ function updateUsersListUI(users) {
 			current_video_title = "Nothing";
 		}
 		mGlobals.queue[user.queue_position]
-		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
+		var innerht = '<p class="p_user" style="white-space: nowrap;">' + '<span class="span_user" onclick="syncWithUserUI(this.getAttribute(\'data-username\'))" data-username="' + user.name +'" style="border-bottom:1px solid '+color+'; cursor: pointer;">'+user.name +  '</span>' + '</span><br><br>' + '</p>';//+ ' is listening to ' + '<span style="font-weight: bold;">' + current_video_title + '</span>' + '</span><br><br>' + '</p>';
 		usersList.innerHTML += innerht;
-	}*/
+	}
 }
 
 function syncWithUserUI(name) {
