@@ -34,6 +34,11 @@
 	float: left;
 }
 
+#txt_name_change {
+	display: block;
+	margin: 0 auto;
+}
+
 .error_div {
 	text-align: center;
 }
