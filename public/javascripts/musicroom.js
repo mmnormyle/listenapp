@@ -187,7 +187,7 @@ function syncWithUserUI(name) {
 function setupVideo() {
 	if(mGlobals.user.queue_position!=-1) {
 		var recommendation = mGlobals.queue[mGlobals.user.queue_position];
-		updateQueueUI(mGlobals.user.queue_position);
+		updateQueueUI(mGlobals.user.queue_position + 1);
 		updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name, recommendation.title);		
 	}
 }
@@ -205,7 +205,7 @@ function userNameChange() {
 function deleteVideoInQueue(queue_position) {
 	var id = mGlobals.queue[queue_position]._id;
 	mGlobals.queue.splice(queue_position, 1);
-	updateQueueUI(mGlobals.user.queue_position);
+	updateQueueUI(mGlobals.user.queue_position + 1);
 	var data =  {
 		recommendationId : id
 	};
@@ -231,8 +231,8 @@ function nextVideoInQueue() {
 		mGlobals.user.waiting = false;
 	}
 	else {
-		$("#p_video_title").text("Use the search bar below.")
-		$("#p_recommender").text("Queue up a song!");
+		$("#p_current_content_info").text("Queue up a song!");
+		$("#p_current_recommender_info").text("Use the search bar above.");
 		mGlobals.user.waiting = true;
 	}
 }
@@ -260,7 +260,7 @@ function syncWithUser(user) {
 	mGlobals.user.queue_position = user.queue_position;
 	mGlobals.user.video_time = user.video_time;
 	mGlobals.user.player_state = user.player_state;
-	updateQueueUI(mGlobals.user.queue_position);
+	updateQueueUI(mGlobals.user.queue_position + 1);
 	setupVideo();
 }
 
@@ -332,7 +332,7 @@ function updateQueue(queue) {
 	queue = JSON.parse(queue);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
-		updateQueueUI(mGlobals.user.queue_position);	
+		updateQueueUI(mGlobals.user.queue_position + 1);
 		if(mGlobals.user.waiting) {
 			nextVideoInQueue();
 		}
