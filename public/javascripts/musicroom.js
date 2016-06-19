@@ -85,8 +85,8 @@ function searchTextChanged(text) {
 
 function searchEnterPressed(text) {
 	var divResults = $("#div_search_results");
-	alert(text);
 	searchVideos(text, function(response) {
+		console.log(response);
 		console.log('were back');
 		//divResults.html("");
 		console.log(response.items);
@@ -457,6 +457,7 @@ function onYouTubeIframeAPIReady() {
 }
 
 function searchVideos(query, callback) {
+	console.log('search for: ' + query);
 	var request = gapi.client.youtube.search.list({
 		part: "snippet",
 		type: "video",
