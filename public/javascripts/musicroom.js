@@ -86,12 +86,8 @@ function searchTextChanged(text) {
 function searchEnterPressed(text) {
 	var divResults = $("#div_search_results");
 	searchVideos(text, function(response) {
-		console.log(response);
-		console.log('were back');
 		//divResults.html("");
-		console.log(response.items);
 		$.each(response.items, function(index, item) {
-			console.log('poop');
 			divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</div><br>' );
 		});
 	});
@@ -207,7 +203,6 @@ function userNameChange() {
 // Backend video and queue control functions
 //==================================================================
 function deleteVideoInQueue(queue_position) {
-	console.log(queue_position);
 	var id = mGlobals.queue[queue_position]._id;
 	mGlobals.queue.splice(queue_position, 1);
 	updateQueueUI(mGlobals.user.queue_position);
@@ -274,7 +269,6 @@ function saveUserNameChange(name) {
 	for(var i=0;i<mGlobals.current_users;i++) {
 		if(mGlobals.user._id===mGlobals.current_users[i]._id) {
 			mGlobals.current_users[i].name = name;
-			console.log('wooooo');
 		}
 	}
 	var data = {
@@ -323,14 +317,11 @@ function receivedChatMessage(data) {
 }
 
 function synchronizeUsers() {
-	console.log('synchronize user request');
 	mGlobals.socket.emit('synchronizeUsers');
 }
 
 function updateUsersList(users) {
 	users = JSON.parse(users);
-	console.log('updateUsersList: ');
-	console.log(users);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.current_users = users;
 		updateUsersListUI(mGlobals.current_users);	
@@ -339,8 +330,6 @@ function updateUsersList(users) {
 
 function updateQueue(queue) {
 	queue = JSON.parse(queue);
-	console.log('updateQueue: ');
-	console.log(queue);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
 		updateQueueUI(mGlobals.user.queue_position);	
@@ -351,21 +340,18 @@ function updateQueue(queue) {
 }
 
 function updateUser(user) {
-	console.log('updateUser');
 	if(mGlobals.sessionInitialized) {
 		mGlobals.user = user;	
 	}
 }
 
 function sessionReady(data) {
-	console.log('sessionReady');
 	mGlobals.sessionId = data.sessionId;
 	mGlobals.queue = data.queue;
 	mGlobals.current_users = data.current_users;
 	if(mGlobals.user.temp) {
 		mGlobals.user = data.user;
 	}
-	console.log('about to save user video state');
 	saveUserVideoState();
 	setInterval(saveUserVideoState, 10000);
 	nextVideoInQueue();
@@ -380,13 +366,11 @@ function setupSockets() {
 }
 
 function foundGenreJam(data) {
-	console.log('found genre jam ' + data.genreName);
 	joinJamSession(data.genreName);
 }
 
 //three entry points: genre, url, text box
 function setupJamSession(urlName) {
-	console.log('setupJamSession');
 	if(mGlobals.entered_jam) {
 		return;
 	}
@@ -457,12 +441,11 @@ function onYouTubeIframeAPIReady() {
 }
 
 function searchVideos(query, callback) {
-	console.log('search for: ' + query);
 	var request = gapi.client.youtube.search.list({
         part: "snippet",
         type: "video",
 	    q: encodeURIComponent(query).replace(/%20/g, "+"),
-	    maxResults: 3
+	    maxResults: 5
     });
 
 	//execute the request
