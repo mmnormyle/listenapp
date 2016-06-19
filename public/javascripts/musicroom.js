@@ -6,7 +6,6 @@ window.mobilecheck = function() {
 
 $(document).ready(function(){
 
-	$(".div_in_room").hide();
 
 	var pathname = window.location.pathname;
 	var roomName = null;
@@ -16,19 +15,14 @@ $(document).ready(function(){
 
 	mGlobals.url_room = roomName;
 
-	$("#txt_search_videos").click(function() {
-		$("#txt_search_videos").val("");
-	});
-	$("#txt_search_videos").keypress(function(e) {
-		if(e.which==13) {
-			searchVideos();
-		}
+	$("#input_search").bind("propertychange input paste", function(event) {
+		searchTextChanged($("#input_search").val());
 	});
 
 	setTimeout(function() {
 		$("#p_link").animate({opacity: 0});
 	}, 10000);
-
+	/*
 	$("#chat_input").keypress(function(e) {
 		if(e.which==13) {
 			sendChatMessage();		
@@ -44,6 +38,8 @@ $(document).ready(function(){
 			emailQueue();
 		}
 	});
+	*/
+	$('.drawer').drawer();
 
 });
 
@@ -73,6 +69,27 @@ var mGlobals = {
 //==================================================================
 // UI Functions
 //==================================================================
+
+function searchTextChanged(text) {
+	if(text.length==0) {
+		$("#div_search_results").fadeOut();
+	}
+	else {
+		$("#div_search_results").fadeIn();
+		searchVideos(text, function(response) {
+			alert('response');
+			/*var searchList = document.getElementById('list_search_results');
+			var results = response.result;
+			$.each(results.items, function(index, item) {
+				searchList.innerHTML += ("<li class='li_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li><br>');
+			});
+			$("#txt_search_videos").hide();
+			$(searchList).fadeIn();
+			$("#txt_search_videos").val("");	*/
+		});
+	}
+}
+
 
 function sessionReadyUI(roomName) {
 	$(".div_in_room").fadeIn(700);
@@ -110,7 +127,7 @@ function updateQueueUI(starting_queue_position) {
 	var end = 5;
 	var div_queue = $("#div_footer");
 	div_queue.html("");
-	while(i<starting_queue_position+5 && i<queue.length) {
+	while(i<queue.length) {
 		var recommendation = queue[i];
 		var innertht;
 		if((j+1)%5===0) {
@@ -160,13 +177,6 @@ function syncWithUserUI(name) {
 			syncWithUser(mGlobals.current_users[i]);
 		}
 	}
-}
-
-function clearSearchResults() {
-	var searchList = document.getElementById('list_search_results');
-	searchList.innerHTML = "";
-	$(searchList).hide();
-	$("#txt_search_videos").fadeIn();
 }
 
 function setupVideo() {
@@ -437,25 +447,15 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
-function searchVideos() {
+function searchVideos(query, callback) {
 	var request = gapi.client.youtube.search.list({
 		part: "snippet",
 		type: "video",
-		q: encodeURIComponent($("#txt_search_videos").val()).replace(/%20/g, "+"),
+		q: encodeURIComponent(query.replace(/%20/g, "+")),
 		maxResults: 3
 	});
 	//execute the request
-	request.execute(function(response) {
-		var searchList = document.getElementById('list_search_results');
-		var results = response.result;
-		clearSearchResults();
-		$.each(results.items, function(index, item) {
-			searchList.innerHTML += ("<li class='li_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li><br>');
-		});
-		$("#txt_search_videos").hide();
-		$(searchList).fadeIn();
-		$("#txt_search_videos").val("");	
-	});
+	request.execute(callback);
 }
 
 function updatePlayerState(state) {

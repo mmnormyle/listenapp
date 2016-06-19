@@ -29,7 +29,7 @@ html, body {
 #div_player {
 	display: inline-block;
 	width: 100%;
-	height: 78%;
+	height: 79%;
 }
 
 #div_current_content_info {
@@ -43,7 +43,6 @@ html, body {
 	display: inline-block;
 	width: 55%;
 	height: 100%;
-	margin-top: .75%;
 	margin-left: 5%;
 	margin-right: .75%;
 }
@@ -71,3 +70,21 @@ html, body {
 	height: 100%;
 }
 
+#div_search_results {
+	display: none;
+	position: absolute;
+	right: 39.9%;
+	width: 55.1%;
+	height: 25%;
+	background: white;
+}
+
+#input_search {
+	display: inline-block;
+	margin-top: 1.35%;
+	margin-left: 5%;
+	width: 54.75%;
+	border: 1px solid #CCCCCC;
+	font-size: 18px;
+	font-family: "Source Code Pro";
+}
