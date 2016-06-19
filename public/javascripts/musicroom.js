@@ -475,8 +475,8 @@ function updatePlayerUI(current_video, current_video_time, current_recommender_n
 		setTimeout(updatePlayerUI(current_video, current_video_time, current_recommender_name), 1000);
 	}
 	mGlobals.player.loadVideoById(current_video, current_video_time, "large");	
-	$("#p_recommender").text("Recommended by " + current_recommender_name);
-	$("#p_video_title").text(current_video_title);
+	$("#p_current_content_info").text(current_video_title);
+	$("#p_current_recommender_info").text('Recommended by: ' + current_recommender_name);
 	var color = 'black';
 	//TODO: shitty
 	for(var i=0;i<mGlobals.current_users.length;i++) {
