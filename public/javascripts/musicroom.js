@@ -86,7 +86,6 @@ function searchTextChanged(text) {
 function searchEnterPressed(text) {
 	var divResults = $("#div_search_results");
 	searchVideos(text, function(response) {
-		//divResults.html("");
 		$.each(response.items, function(index, item) {
 			divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</div><br>' );
 		});
@@ -154,6 +153,27 @@ function emailQueue() {
 }
 
 function updateUsersListUI(users) {
+	var usersList = document.getElementById('div_users_list');
+	usersList.innerHTML = "";
+	for(var i=0;i<users.length;i++) {
+		var user = users[i];
+		//uses local user data instead of what is currently in the server
+		if(user._id===mGlobals.user._id) {
+			user = mGlobals.user;
+		}
+		var color = user.color;
+		var queue_position = user.queue_position;
+		if(queue_position!=-1) {
+			current_video_title = mGlobals.queue[queue_position].title;
+		}
+		else {
+			current_video_title = "Nothing";
+		}
+		mGlobals.queue[user.queue_position];
+		//		usersList.innerHTML += "<div class='div_user'></div>";
+		console.log('doing it');
+		usersList.innerHTML += '<div class="div_user" style="background: ' + user.color + '"><p class="p_user"> ' + user.name.charAt(0) + '</p></div>';
+	}
 	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {

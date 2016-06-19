@@ -89,9 +89,16 @@ html, body {
 	background: white;
 }
 
+#div_users_list {
+	display: inline-block;
+	width: 39.9%;
+	height: 100%;
+}
+
 #input_search {
 	display: inline-block;
-	margin-top: 1.35%;
+	float: left;
+	margin-top: 1.3%;
 	margin-left: 5%;
 	width: 54.75%;
 	border: 1px solid #CCCCCC;
@@ -105,5 +112,23 @@ html, body {
 }
 
 #div_info_holder {
+	width: 40%;
 	text-align: center;
 }
+
+.p_user {
+	color: white;
+	font-family: 'Josefin Sans';
+}
+
+.div_user {
+	display: flex;
+	justify-content: center; /* align horizontal */
+	align-items: center; /* align vertical */
+	height: 100%; 
+	width: 12.5%; 
+	float: right;
+	text-align: center;
+}
+
+.p_user {}
