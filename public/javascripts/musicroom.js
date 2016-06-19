@@ -223,6 +223,7 @@ function previousVideoInQueue() {
 }
 
 function nextVideoInQueue() {
+	console.log(mGlobals.user.queue_position);
 	mGlobals.user.video_time = 0;
 	var queue = mGlobals.queue;
 	if((mGlobals.user.queue_position+1)<queue.length) {
@@ -231,8 +232,6 @@ function nextVideoInQueue() {
 		mGlobals.user.waiting = false;
 	}
 	else {
-		$("#p_current_content_info").text("Queue up a song!");
-		$("#p_current_recommender_info").text("Use the search bar above.");
 		mGlobals.user.waiting = true;
 	}
 }
@@ -354,6 +353,10 @@ function sessionReady(data) {
 	}
 	saveUserVideoState();
 	setInterval(saveUserVideoState, 10000);
+	if(mGlobals.queue.length==0) {
+		$("#p_current_content_info").text("Queue up a song!");
+		$("#p_current_recommender_info").text("Use the search bar above.");
+	}
 	nextVideoInQueue();
 	updateUsersListUI(mGlobals.current_users);
 	sessionReadyUI(mGlobals.session.name);
