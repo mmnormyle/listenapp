@@ -85,6 +85,7 @@ function searchTextChanged(text) {
 
 function searchEnterPressed(text) {
 	var divResults = $("#div_search_results");
+	divResults.html("");
 	searchVideos(text, function(response) {
 		$.each(response.items, function(index, item) {
 			divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</div><br>' );
