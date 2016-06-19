@@ -6,6 +6,7 @@ html
     link(href='https://fonts.googleapis.com/css?family=Josefin+Sans&subset=latin,latin-ext' rel='stylesheet' type='text/css')
     script(src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js")
     script(src="https://cdn.socket.io/socket.io-1.0.0.js?onload=socketioLoad")
+    sciprt(src="http://popcornjs.org/code/dist/popcorn-complete.js")
     script(src="/javascripts/musicroom.js")
     link(href='https://fonts.googleapis.com/css?family=Cousine' rel='stylesheet' type='text/css')
     link(href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300' rel='stylesheet' type='text/css')
@@ -19,12 +20,9 @@ html
         //user lists
     div#div_body.div_root
         //player
-        #div_player
+        #div_current_content
+            #div_player
+            #div_current_content_info.shadow
         //info
-        #div_info
+        #div_info.shadow
     div#div_footer.div_root
-        #div_content_1.div_content
-        #div_content_2.div_content        
-        #div_content_3.div_content
-        #div_content_4.div_content
-        #div_content_5.div_content

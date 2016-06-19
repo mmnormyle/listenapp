@@ -45,8 +45,6 @@ $(document).ready(function(){
 		}
 	});
 
-	mGlobals.content_divs = [document.getElementById("div_content_1"), document.getElementById("div_content_2"),  document.getElementById("div_content_3"), document.getElementById("div_content_4"), document.getElementById("div_content_5")];
-
 });
 
 
@@ -108,10 +106,21 @@ function updateQueueUI(starting_queue_position) {
 	var queue = mGlobals.queue;
 	var i = starting_queue_position;
 	var j = 0;
+	//TODO: make robust
+	var end = 5;
+	var div_queue = $("#div_footer");
+	div_queue.html("");
 	while(i<starting_queue_position+5 && i<queue.length) {
 		var recommendation = queue[i];
-		var innerht = "<img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img>";
-		$(mGlobals.content_divs[i]).innerHTML = innerht; 
+		var innertht;
+		if((j+1)%5===0) {
+			innerht = "<div class='div_content' style='margin-right: 0'><img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img></div>";
+		}
+		else {
+			innerht = "<div class='div_content'><img class='img_queue_item' data-queue_position='" + i + "' data-thumb_URL='" + recommendation.thumb_URL + "' onmouseover='queueRollover(this)' onmouseout='queueRolloff(this)' src='" + recommendation.thumb_URL + "'></img></div>";
+
+		}
+		div_queue.html(div_queue.html() + innerht);
 		i++;
 		j++;
 	}
@@ -163,7 +172,7 @@ function clearSearchResults() {
 function setupVideo() {
 	if(mGlobals.user.queue_position!=-1) {
 		var recommendation = mGlobals.queue[mGlobals.user.queue_position];
-		updateQueueUI(mGlobals.queue, mGlobals.user.queue_position);
+		updateQueueUI(mGlobals.user.queue_position);
 		updatePlayerUI(recommendation.videoId, mGlobals.user.video_time, recommendation.recommender_name, recommendation.title);		
 	}
 }
@@ -182,7 +191,7 @@ function deleteVideoInQueue(queue_position) {
 	console.log(queue_position);
 	var id = mGlobals.queue[queue_position]._id;
 	mGlobals.queue.splice(queue_position, 1);
-	updateQueueUI();
+	updateQueueUI(mGlobals.user.queue_position);
 	var data =  {
 		recommendationId : id
 	};
@@ -237,7 +246,7 @@ function syncWithUser(user) {
 	mGlobals.user.queue_position = user.queue_position;
 	mGlobals.user.video_time = user.video_time;
 	mGlobals.user.player_state = user.player_state;
-	updateQueueUI();
+	updateQueueUI(mGlobals.user.queue_position);
 	setupVideo();
 }
 
@@ -315,7 +324,7 @@ function updateQueue(queue) {
 	console.log(queue);
 	if(mGlobals.sessionInitialized) {
 		mGlobals.queue = queue;
-		updateQueueUI();	
+		updateQueueUI(mGlobals.user.queue_position);	
 		if(mGlobals.user.waiting) {
 			nextVideoInQueue();
 		}
