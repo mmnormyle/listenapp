@@ -243,7 +243,7 @@ function nextVideoInQueue() {
 }
 
 function queueSelectedVideo(elmnt) {
-	clearSearchResults();
+	$("#div_search_results").fadeOut();
 	var videoId = elmnt.getAttribute('data-videoId');
 	var title = elmnt.innerText || element.textContent;
 	var thumb_url = elmnt.getAttribute('data-thumb_URL');
@@ -459,11 +459,12 @@ function onYouTubeIframeAPIReady() {
 function searchVideos(query, callback) {
 	console.log('search for: ' + query);
 	var request = gapi.client.youtube.search.list({
-		part: "snippet",
-		type: "video",
-		q: encodeURIComponent(query.replace(/%20/g, "+")),
-		maxResults: 5
-	});
+        part: "snippet",
+        type: "video",
+	    q: encodeURIComponent(query).replace(/%20/g, "+"),
+	    maxResults: 3
+    });
+
 	//execute the request
 	request.execute(callback);
 }
