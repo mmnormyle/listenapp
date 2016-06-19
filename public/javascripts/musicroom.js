@@ -19,6 +19,12 @@ $(document).ready(function(){
 		searchTextChanged($("#input_search").val());
 	});
 
+	$("#input_search").keypress(function(e) {
+		if(e.which==13) {
+			searchEnterPressed($("#input_search").val());
+		}
+	});
+
 	setTimeout(function() {
 		$("#p_link").animate({opacity: 0});
 	}, 10000);
@@ -71,25 +77,28 @@ var mGlobals = {
 //==================================================================
 
 function searchTextChanged(text) {
+	var divResults = $("#div_search_results");
 	if(text.length==0) {
-		$("#div_search_results").fadeOut();
-	}
-	else {
-		$("#div_search_results").fadeIn();
-		searchVideos(text, function(response) {
-			alert('response');
-			/*var searchList = document.getElementById('list_search_results');
-			var results = response.result;
-			$.each(results.items, function(index, item) {
-				searchList.innerHTML += ("<li class='li_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</li><br>');
-			});
-			$("#txt_search_videos").hide();
-			$(searchList).fadeIn();
-			$("#txt_search_videos").val("");	*/
-		});
+		divResults.fadeOut();
 	}
 }
 
+function searchEnterPressed(text) {
+	var divResults = $("#div_search_results");
+	alert(text);
+	searchVideos(text, function(response) {
+		console.log('were back');
+		//divResults.html("");
+		console.log(response.items);
+		$.each(response.items, function(index, item) {
+			console.log('poop');
+			divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</div><br>' );
+		});
+	});
+	if(!divResults.is(':visible')) {
+		divResults.fadeIn();
+	}
+}
 
 function sessionReadyUI(roomName) {
 	$(".div_in_room").fadeIn(700);
@@ -422,7 +431,7 @@ function sendChatMessage() {
 //==================================================================
 
 function youtubeAPIInit() {
-	gapi.client.setApiKey("AIzaSyAinPSDrNl9ols4DgE9XjHM8gcuJKZ7D1E");
+	gapi.client.setApiKey("AIzaSyC4A-dsGk-ha_b-eDpbxaVQt5bR7cOUddc");
 	gapi.client.load("youtube", "v3", function() {
 		mGlobals.youtube_api_ready = true;
 		if(mGlobals.url_room && mGlobals.player_ready) {
@@ -452,7 +461,7 @@ function searchVideos(query, callback) {
 		part: "snippet",
 		type: "video",
 		q: encodeURIComponent(query.replace(/%20/g, "+")),
-		maxResults: 3
+		maxResults: 5
 	});
 	//execute the request
 	request.execute(callback);
