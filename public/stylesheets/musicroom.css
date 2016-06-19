@@ -69,7 +69,8 @@ html, body {
 .div_content {
 	background: white;
 	display: inline-block;
-	width: 17.6%;
+	margin-bottom: 1%;
+	width: 15.6%;
 	height: 80%;
 	margin-right: 3%;
 }
