@@ -87,8 +87,25 @@ html, body {
 	position: absolute;
 	right: 39.9%;
 	width: 55.1%;
-	height: 25%;
+	top: 6%;
+	padding-top: .75%;
+	padding-left: .5%;
 	background: white;
+}
+
+.div_search_result {
+	font-family: 'Josefin Sans';
+	cursor: pointer;
+}
+
+.div_search_result > * {
+	cursor: pointer;
+}
+
+.div_search_result > p {
+	margin: 0;
+	font-size: 24px;
+	margin-bottom: 2%;
 }
 
 #div_users_list {

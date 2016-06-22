@@ -6,7 +6,6 @@ window.mobilecheck = function() {
 
 $(document).ready(function(){
 
-
 	var pathname = window.location.pathname;
 	var roomName = null;
 	if(pathname.indexOf('\/rooms\/')>-1) {
@@ -19,6 +18,7 @@ $(document).ready(function(){
 	mGlobals.ui.input_name = $("#name_input");
 	mGlobals.ui.input_chat = $("#chat_input");
 	mGlobals.ui.ul_chat = $("#ul_chat");
+	mGlobals.ui.div_search_results = $("#div_search_results");
 
 	mGlobals.ui.input_search.bind("propertychange input paste", function(event) {
 		searchTextChanged($("#input_search").val());
@@ -41,6 +41,11 @@ $(document).ready(function(){
 			sendChatMessage(mGlobals.ui.input_chat);
 		}	
 	})
+
+	document.body.addEventListener('click', function() {
+		mGlobals.ui.div_search_results.fadeOut();
+		mGlobals.input_search.val("");
+	}, true); 
 	/*
 	$("#chat_input").keypress(function(e) {
 		if(e.which==13) {
@@ -97,8 +102,8 @@ function searchEnterPressed(input_search) {
 	divResults.html("");
 	searchVideos(input_search.val(), function(response) {
 		$.each(response.items, function(index, item) {
-			divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</div><br>' );
-		});
+		divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>" + '<p class="text_search_result">' +  item.snippet.title+ '</p></div>' );
+	});
 	});
 	if(!divResults.is(':visible')) {
 		divResults.fadeIn();
@@ -264,7 +269,8 @@ function nextVideoInQueue() {
 }
 
 function queueSelectedVideo(elmnt) {
-	$("#div_search_results").fadeOut();
+	mGlobals.ui.div_search_results.fadeOut();
+	mGlobals.ui.input_search.val("");
 	var videoId = elmnt.getAttribute('data-videoId');
 	var title = elmnt.innerText || element.textContent;
 	var thumb_url = elmnt.getAttribute('data-thumb_URL');
