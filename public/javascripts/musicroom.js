@@ -15,28 +15,36 @@ $(document).ready(function(){
 
 	mGlobals.url_room = roomName;
 
-	$("#input_search").bind("propertychange input paste", function(event) {
+	mGlobals.ui.input_search = $("#input_search");
+	mGlobals.ui.input_name = $("#name_input");
+	mGlobals.ui.input_chat = $("#chat_input");
+	mGlobals.ui.ul_chat = $("#ul_chat");
+
+	mGlobals.ui.input_search.bind("propertychange input paste", function(event) {
 		searchTextChanged($("#input_search").val());
 	});
 
-	$("#input_search").keypress(function(e) {
+	mGlobals.ui.input_search.keypress(function(e) {
 		if(e.which==13) {
-			searchEnterPressed($("#input_search").val());
+			searchEnterPressed(mGlobals.ui.input_search);
 		}
 	});
 
-	setTimeout(function() {
-		$("#p_link").animate({opacity: 0});
-	}, 10000);
+	mGlobals.ui.input_name.keypress(function(e) {
+		if(e.which==13) {
+			userNameChange(mGlobals.ui.input_name);
+		}	
+	})
+
+	mGlobals.ui.input_chat.keypress(function(e) {
+		if(e.which==13) {
+			sendChatMessage(mGlobals.ui.input_chat);
+		}	
+	})
 	/*
 	$("#chat_input").keypress(function(e) {
 		if(e.which==13) {
 			sendChatMessage();		
-		}
-	});
-	$("#txt_name_change").keypress(function(e) {
-		if(e.which==13) {
-			userNameChange();
 		}
 	});
 	$("#txt_email").keypress(function(e) {
@@ -70,6 +78,7 @@ var mGlobals = {
 	session : {},
 	queue : [],
 	current_users : [],
+	ui : {}
 };
 
 //==================================================================
@@ -83,10 +92,10 @@ function searchTextChanged(text) {
 	}
 }
 
-function searchEnterPressed(text) {
+function searchEnterPressed(input_search) {
 	var divResults = $("#div_search_results");
 	divResults.html("");
-	searchVideos(text, function(response) {
+	searchVideos(input_search.val(), function(response) {
 		$.each(response.items, function(index, item) {
 			divResults.html(divResults.html() + "<div class='div_search_result' onClick='queueSelectedVideo(this)' data-videoId='" + item.id.videoId + "' data-thumb_URL='"+item.snippet.thumbnails.medium.url+"'>"+item.snippet.title+'</div><br>' );
 		});
@@ -172,7 +181,6 @@ function updateUsersListUI(users) {
 		}
 		mGlobals.queue[user.queue_position];
 		//		usersList.innerHTML += "<div class='div_user'></div>";
-		console.log('doing it');
 		usersList.innerHTML += '<div class="div_user" style="background: ' + user.color + '"><p class="p_user"> ' + user.name.charAt(0) + '</p></div>';
 	}
 	/*var usersList = document.getElementById('div_users_list');
@@ -213,11 +221,10 @@ function setupVideo() {
 	}
 }
 
-function userNameChange() {
-	$("#txt_name_change").hide();
-	$("#chat_input").fadeIn(700);
-	saveUserNameChange($("#txt_name_change").val());
-	$("#txt_name_change").hide();	
+function userNameChange(name_input) {
+	name_input.hide();
+	mGlobals.ui.input_chat.fadeIn();
+	saveUserNameChange(name_input.val());
 }
 
 //==================================================================
@@ -244,7 +251,6 @@ function previousVideoInQueue() {
 }
 
 function nextVideoInQueue() {
-	console.log(mGlobals.user.queue_position);
 	mGlobals.user.video_time = 0;
 	var queue = mGlobals.queue;
 	if((mGlobals.user.queue_position+1)<queue.length) {
@@ -328,9 +334,9 @@ function setupSocketEvents() {
 function receivedChatMessage(data) {
 	var msg = data.msg;
 	var user = data.user;
-	var innerHTML = $('#messages').html() || "";
-	$('#messages').html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
-	var children = $('#messages').children();
+	var innerHTML = mGlobals.ui.ul_chat.html() || "";
+	mGlobals.ui.ul_chat.html(innerHTML +'<li><span style="color: '+user.color+'">'+user.name+'</span>'+'<span>'+ ': ' + msg+ '</span></li>');
+	var children = mGlobals.ui.ul_chat.children();
 	if(children.length>10) {
 		children[0].remove();
 	}
@@ -410,9 +416,6 @@ function setupJamSession(urlName) {
 function joinJamSession(encodedSessionName) {
 	mGlobals.session.name = decodeURI(encodedSessionName);
 
-
-	$("#chat_input").hide();
-	$("#txt_name_change").show();
 	mGlobals.user = createTempUser('Anonymous');
 	
 	var data = {
@@ -427,10 +430,10 @@ function joinJamSession(encodedSessionName) {
 //==================================================================
 // Chat functions
 //==================================================================
-function sendChatMessage() {
+function sendChatMessage(chat_input) {
 	if(mGlobals.sessionInitialized) {
-		mGlobals.socket.emit('chatMessage', $("#chat_input").val());
-		$("#chat_input").val("");
+		mGlobals.socket.emit('chatMessage', chat_input.val());
+		chat_input.val("");
 	}
 }
 
