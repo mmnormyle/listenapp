@@ -14,45 +14,48 @@ html
     script(src="https://cdnjs.cloudflare.com/ajax/libs/drawer/3.2.0/js/drawer.min.js")
 
     script(src="/javascripts/musicroom.js")
+    script(src="/javascripts/spin.js")
     link(href='https://fonts.googleapis.com/css?family=Cousine' rel='stylesheet' type='text/css')
     link(href='https://fonts.googleapis.com/css?family=Source+Code+Pro:300' rel='stylesheet' type='text/css')
     script(src="https://apis.google.com/js/client.js?onload=youtubeAPIInit")
     script(src="https://www.youtube.com/iframe_api")
     
   body(class="drawer drawer--left")
-    div#div_header.div_root(role="banner")
-        button(type="button" class="drawer-toggle drawer-hamburger")
-            span(class="sr-only")
-                | toggle navigation
-            span(class="drawer-hamburger-icon")
-        nav(class="drawer-nav" role="navigation")
-            ul(class="drawer-menu")
-                li
-                    a(class="drawer-brand" href="#")
-                        | Shit I haven't done this part yet
-                li
-                    a(class="drawer-menu-item" href="#")
-                        | Nav1 
-                li
-                    a(class="drawer-menu-item" href="#")
-                        | Nav2
-        input#input_search(placeholder="type in an artist and song name and press enter")
-        #div_search_results
-        #div_users_list
-    div#div_body.div_root
-        //player
-        #div_current_content
-            #div_player
-            #div_current_content_info.shadow
-                img(src="../images/arrows-1.png" style="margin-right: 15%; cursor: pointer" onclick="previousVideoInQueue()")
-                div#div_info_holder
-                    #p_current_content_info.current_content_info
-                    br
-                    #p_current_recommender_info.current_content_info
-                img(src="../images/arrows.png" style="margin-left: 15%; cursor: pointer" onclick="nextVideoInQueue()")
-        //info
-        #div_info.shadow
-            ul#ul_chat
-            input#name_input.chat_input(placeholder="enter your name")
-            input#chat_input.chat_input(placeholder="thoughts? press enter")
-    div#div_footer.div_root
+    div#div_loading.everything
+    div#div_everything.everything
+        div#div_header.div_root(role="banner")
+            button(type="button" class="drawer-toggle drawer-hamburger")
+                span(class="sr-only")
+                    | toggle navigation
+                span(class="drawer-hamburger-icon")
+            nav(class="drawer-nav" role="navigation")
+                ul(class="drawer-menu")
+                    li
+                        a(class="drawer-brand" href="#")
+                            | Shit I haven't done this part yet
+                    li
+                        a(class="drawer-menu-item" href="#")
+                            | Nav1 
+                    li
+                        a(class="drawer-menu-item" href="#")
+                            | Nav2
+            input#input_search(placeholder="type in an artist and song name and press enter")
+            #div_search_results
+            #div_users_list
+        div#div_body.div_root
+            //player
+            #div_current_content
+                #div_player
+                #div_current_content_info.shadow
+                    img(src="../images/arrows-1.png" style="margin-right: 15%; cursor: pointer" onclick="previousVideoInQueue()")
+                    div#div_info_holder
+                        #p_current_content_info.current_content_info
+                        br
+                        #p_current_recommender_info.current_content_info
+                    img(src="../images/arrows.png" style="margin-left: 15%; cursor: pointer" onclick="nextVideoInQueue()")
+            //info
+            #div_info.shadow
+                ul#ul_chat
+                input#name_input.chat_input(placeholder="enter your name")
+                input#chat_input.chat_input(placeholder="thoughts? press enter")
+        div#div_footer.div_root
