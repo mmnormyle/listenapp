@@ -143,9 +143,6 @@ function sessionReadyUI(roomName) {
 	mGlobals.ui.div_loading.hide();
 	mGlobals.ui.spinner.stop();
 	mGlobals.ui.div_everything.animate({opacity: 1}, 'fast');
-	setTimeout(function() {
-		$("#p_invite_friends").fadeOut(700);
-	}, 10000);
 } 
 
 function genreClicked(event) {
