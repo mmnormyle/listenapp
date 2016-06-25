@@ -124,6 +124,15 @@ html, body {
 	height: 100%;
 }
 
+.div_user_info {
+	position: absolute;
+	background: white;
+}
+
+.div_user_info > p {
+	background: white;
+}
+
 #input_search {
 	display: inline-block;
 	float: left;

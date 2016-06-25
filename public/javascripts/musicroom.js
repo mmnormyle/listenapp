@@ -213,8 +213,26 @@ function updateUsersListUI(users) {
 			current_video_title = "Nothing";
 		}
 		mGlobals.queue[user.queue_position];
-		//		usersList.innerHTML += "<div class='div_user'></div>";
-		usersList.innerHTML += '<div class="div_user" style="background: ' + user.color + '"><p class="p_user"> ' + user.name.charAt(0) + '</p></div>';
+
+		var div_user = document.createElement('div');
+		div_user.style.background = user.color;
+		div_user.className = "div_user";
+
+		var p_user = document.createElement('p');
+		p_user.className = "p_user";
+		p_user.appendChild(document.createTextNode(user.name.charAt(0)));
+
+		div_user.appendChild(p_user);
+		usersList.appendChild(div_user);
+
+		// Setup user info for rollover
+		/*var div_user_info = document.createElement('div');
+		div_user_info.className = "div_user_info";
+		p_user_info = document.createElement('p');
+		p_user_info.className = "p_user_info";
+		p_user_info.appendChild(document.createTextNode(user.name));
+		div_user_info.appendChild(p_user_info);*/
+
 	}
 	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
