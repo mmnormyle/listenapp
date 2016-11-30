@@ -21,6 +21,7 @@ html, body {
 	height: 9%;
 	background: white;
 	box-shadow: 0 3px 3px #E0E0E0;
+	position: relative;
 }
 
 #div_body {
@@ -127,6 +128,7 @@ html, body {
 .div_user_info {
 	position: absolute;
 	background: white;
+	top: 100%;
 }
 
 .div_user_info > p {
@@ -167,6 +169,7 @@ html, body {
 	height: 100%; 
 	width: 12.5%; 
 	float: right;
+	position: relative;
 	text-align: center;
 }
 

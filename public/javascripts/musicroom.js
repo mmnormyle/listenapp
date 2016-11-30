@@ -197,6 +197,7 @@ function emailQueue() {
 
 function updateUsersListUI(users) {
 	var usersList = document.getElementById('div_users_list');
+
 	usersList.innerHTML = "";
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
@@ -226,13 +227,15 @@ function updateUsersListUI(users) {
 		usersList.appendChild(div_user);
 
 		// Setup user info for rollover
-		/*var div_user_info = document.createElement('div');
+		var div_user_info = document.createElement('div');
 		div_user_info.className = "div_user_info";
 		p_user_info = document.createElement('p');
 		p_user_info.className = "p_user_info";
 		p_user_info.appendChild(document.createTextNode(user.name));
-		div_user_info.appendChild(p_user_info);*/
+		div_user_info.appendChild(p_user_info);
 
+		document.body.appendChild(div_user_info);
+		div_user_info.style.left = screen.width - div_user.offsetWidth*i;
 	}
 	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
