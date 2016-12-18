@@ -73,7 +73,9 @@ $(document).ready(function(){
 
 	document.body.addEventListener('click', function() {
 		mGlobals.ui.div_search_results.fadeOut();
-		mGlobals.input_search.val("");
+		if(mGlobals.input_search) {
+			mGlobals.input_search.val("");
+		}
 	}, true); 
 	/*
 	$("#chat_input").keypress(function(e) {
@@ -199,6 +201,7 @@ function updateUsersListUI(users) {
 	var usersList = document.getElementById('div_users_list');
 
 	usersList.innerHTML = "";
+	var divarr = [];
 	for(var i=0;i<users.length;i++) {
 		var user = users[i];
 		//uses local user data instead of what is currently in the server
@@ -213,24 +216,34 @@ function updateUsersListUI(users) {
 		else {
 			current_video_title = "Nothing";
 		}
-		mGlobals.queue[user.queue_position];
 
 		var div_user = document.createElement('div');
 		div_user.style.background = user.color;
 		div_user.className = "div_user tooltip";
-		div_user.onclick = function() { syncWithUser(user); }
+		div_user.setAttribute('data-username', user.name);
 
 		var p_user = document.createElement('p');
 		p_user.className = "p_user";
+		p_user.setAttribute('data-username', user.name);
 		p_user.appendChild(document.createTextNode(user.name.charAt(0)));
 
 		var span_tooltip = document.createElement('span');
 		span_tooltip.className = "tooltiptext";
+		span_tooltip.setAttribute('data-username', user.name);
 		span_tooltip.innerHTML = "Click to sync with " + user.name + "!";
 
 		div_user.appendChild(p_user);
 		div_user.appendChild(span_tooltip);
 		usersList.appendChild(div_user);
+
+		divarr.push(div_user);
+	}
+	for(var i=0;i<divarr.length;i++) {
+		var mydiv = divarr[i];
+		$(mydiv).click(function() {
+			var username = event.target.getAttribute('data-username');
+			syncWithUser(username);
+		});
 	}
 	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
@@ -253,16 +266,6 @@ function updateUsersListUI(users) {
 		usersList.innerHTML += innerht;
 	}*/
 }
-
-/*
-function syncWithUserUI(name) {
-	for(var i=0;i<mGlobals.current_users.length;i++) {
-		if(mGlobals.current_users[i].name===name) {
-			syncWithUser(mGlobals.current_users[i]);
-		}
-	}
-}
-*/
 
 function setupVideo() {
 	if(mGlobals.user.queue_position!=-1) {
@@ -334,11 +337,16 @@ function queueSelectedVideo(elmnt) {
 // Basically all the hard stuff
 //==================================================================
 
-function syncWithUser(user) {
-	alert('poop');
-	mGlobals.user.queue_position = user.queue_position;
-	mGlobals.user.video_time = user.video_time;
-	mGlobals.user.player_state = user.player_state;
+function syncWithUser(username) {
+	var myuser = {}
+	for(var i=0;i<mGlobals.current_users.length;i++) {
+		if(mGlobals.current_users[i].name===username) {
+			myuser = mGlobals.current_users[i];
+		}
+	}
+	mGlobals.user.queue_position = myuser.queue_position;
+	mGlobals.user.video_time = myuser.video_time;
+	mGlobals.user.player_state = myuser.player_state;
 	updateQueueUI(mGlobals.user.queue_position + 1);
 	setupVideo();
 }
