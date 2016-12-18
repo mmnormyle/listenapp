@@ -87,10 +87,21 @@ input {
     text-align: center;
 }
 
+.splash {
+	margin-top: 5%;
+	margin-bottom: 5%;
+}
+
 .search {
 	margin-left: 25%;
 	margin-right: 25%;
 	text-align: center;
+}
+
+#img_splash {
+	display: block;
+	margin-left: auto;
+	margin-right: auto;
 }
 
 ul {

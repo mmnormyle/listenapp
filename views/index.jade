@@ -12,13 +12,8 @@ html
     
   body
     div(class="wrapper")
-        br
-        br
-        br
-        h1#h_splash
+        img(class="splash", id="img_splash", src="../images/treble.png", style="height: 200; width: 100px")
+        h1#h_splash.splash
             | Listen to and share music with others. Enter a room name to get started.
-        br
-        br
-        br
-        div.search
+        div(class="search splash")
             input(id="txt_group_join", type="text", placeholder="What's your room name?" class="edittext")
