@@ -217,13 +217,18 @@ function updateUsersListUI(users) {
 
 		var div_user = document.createElement('div');
 		div_user.style.background = user.color;
-		div_user.className = "div_user";
+		div_user.className = "div_user tooltip";
 
 		var p_user = document.createElement('p');
 		p_user.className = "p_user";
 		p_user.appendChild(document.createTextNode(user.name.charAt(0)));
 
+		var span_tooltip = document.createElement('span');
+		span_tooltip.className = "tooltiptext";
+		span_tooltip.innerHTML = "Tooltip text";
+
 		div_user.appendChild(p_user);
+		div_user.appendChild(span_tooltip);
 		usersList.appendChild(div_user);
 
 		// Setup user info for rollover
