@@ -218,6 +218,7 @@ function updateUsersListUI(users) {
 		var div_user = document.createElement('div');
 		div_user.style.background = user.color;
 		div_user.className = "div_user tooltip";
+		div_user.onclick = function() { syncWithUser(user); }
 
 		var p_user = document.createElement('p');
 		p_user.className = "p_user";
@@ -225,22 +226,11 @@ function updateUsersListUI(users) {
 
 		var span_tooltip = document.createElement('span');
 		span_tooltip.className = "tooltiptext";
-		span_tooltip.innerHTML = "Tooltip text";
+		span_tooltip.innerHTML = "Click to sync with " + user.name + "!";
 
 		div_user.appendChild(p_user);
 		div_user.appendChild(span_tooltip);
 		usersList.appendChild(div_user);
-
-		// Setup user info for rollover
-		var div_user_info = document.createElement('div');
-		div_user_info.className = "div_user_info";
-		p_user_info = document.createElement('p');
-		p_user_info.className = "p_user_info";
-		p_user_info.appendChild(document.createTextNode(user.name));
-		div_user_info.appendChild(p_user_info);
-
-		document.body.appendChild(div_user_info);
-		div_user_info.style.left = screen.width - div_user.offsetWidth*i;
 	}
 	/*var usersList = document.getElementById('div_users_list');
 	usersList.innerHTML = "";
@@ -264,6 +254,7 @@ function updateUsersListUI(users) {
 	}*/
 }
 
+/*
 function syncWithUserUI(name) {
 	for(var i=0;i<mGlobals.current_users.length;i++) {
 		if(mGlobals.current_users[i].name===name) {
@@ -271,6 +262,7 @@ function syncWithUserUI(name) {
 		}
 	}
 }
+*/
 
 function setupVideo() {
 	if(mGlobals.user.queue_position!=-1) {
@@ -343,6 +335,7 @@ function queueSelectedVideo(elmnt) {
 //==================================================================
 
 function syncWithUser(user) {
+	alert('poop');
 	mGlobals.user.queue_position = user.queue_position;
 	mGlobals.user.video_time = user.video_time;
 	mGlobals.user.player_state = user.player_state;
